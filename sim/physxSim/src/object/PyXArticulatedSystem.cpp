@@ -408,9 +408,92 @@ void physx_sim::object::PyXArticulatedSystem::updateVisuals() {
     visColObj.clear();
     visProps_.clear();
     visColProps_.clear();
-    initVisual(articulation_);
+    initVisual();
 }
 
-void physx_sim::object::PyXArticulatedSystem::initVisual(physx::PxArticulationReducedCoordinate* articulation_) {
+void physx_sim::object::PyXArticulatedSystem::initVisual() {
 
+    physx::PxArticulationReducedCoordinate* articulation = articulation_;
+
+    // 获取所有关节
+    int n = articulation->getNbLinks();
+    std::vector<physx::PxArticulationLink*> links(n, nullptr);
+    articulation->getLinks(links.data(), n, 0);
+
+    for(int i = 0; i < n; i++) {
+        physx::PxArticulationLink* link = links[i];
+
+        // 获取该关节所有形状
+        physx::PxU32 nbShapes = link->getNbShapes();
+        std::vector<physx::PxShape*> shapes(nbShapes);
+        link->getShapes(shapes.data(), nbShapes);
+
+        for(physx::PxU32 j = 0; j < nbShapes; j++) {
+            physx::PxShape* shape = shapes[j];
+            physx::PxGeometryHolder geom = shape->getGeometry();
+
+            // 计算全局位姿
+            physx::PxTransform linkPose = link->getGlobalPose();
+            physx::PxTransform shapeLocalPose = shape->getLocalPose();
+            physx::PxTransform globalPose = linkPose * shapeLocalPose;
+
+            // 转换旋转矩阵
+            Eigen::Quaterniond quat(
+                    globalPose.q.w,
+                    globalPose.q.x,
+                    globalPose.q.y,
+                    globalPose.q.z
+            );
+            benchmark::Mat<3,3> mat;
+            mat.e() = quat.toRotationMatrix();
+
+            // 转换位置
+            benchmark::Vec<3> position = {
+                    static_cast<double>(globalPose.p.x),
+                    static_cast<double>(globalPose.p.y),
+                    static_cast<double>(globalPose.p.z)
+            };
+
+            // 处理不同几何类型
+            switch(geom.getType()) {
+                case physx::PxGeometryType::eBOX: {
+                    physx::PxBoxGeometry box = geom.box();
+                    benchmark::Vec<4> boxSize = {
+                            box.halfExtents.x * 2,
+                            box.halfExtents.y * 2,
+                            box.halfExtents.z * 2,
+                            0
+                    };
+                    visObj.emplace_back(std::make_tuple(mat, position, j, benchmark::object::Shape::Box, color_));
+                    visProps_.emplace_back(std::make_pair("", boxSize));
+                    break;
+                }
+                case physx::PxGeometryType::eSPHERE: {
+                    physx::PxSphereGeometry sphere = geom.sphere();
+                    benchmark::Vec<4> sphereSize = {sphere.radius, 0, 0, 0};
+                    visObj.emplace_back(std::make_tuple(mat, position, j, benchmark::object::Shape::Sphere, color_));
+                    visProps_.emplace_back(std::make_pair("", sphereSize));
+                    break;
+                }
+                case physx::PxGeometryType::eCAPSULE: {
+                    physx::PxCapsuleGeometry capsule = geom.capsule();
+                    benchmark::Vec<4> cylSize = {
+                            capsule.radius,
+                            capsule.halfHeight * 2,
+                            0,
+                            0
+                    };
+                    visObj.emplace_back(std::make_tuple(mat, position, j, benchmark::object::Shape::Cylinder, color_));
+                    visProps_.emplace_back(std::make_pair("", cylSize));
+                    break;
+                }
+                case physx::PxGeometryType::eTRIANGLEMESH:
+                case physx::PxGeometryType::eCONVEXMESH:
+                    // 默认不处理mesh
+                    break;
+                default:
+                RAIFATAL("not supported shape");
+            }
+        }
+    }
 }

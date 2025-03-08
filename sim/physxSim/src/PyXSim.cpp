@@ -10,13 +10,56 @@ void PyXSim::updateFrame() {
     const bool showAlternateGraphicsIfexists = gui_->getCustomToggleState(3);
 
     for (auto &as : asHandles_) {
+
         benchmark::Vec<4> quat;
         benchmark::Vec<3> pos;
         benchmark::Vec<4> color;
 
         // update visuals for articulated system
         as->updateVisuals();
+        std::cout << as.visual().size() << std::endl;
+
+        if (showAlternateGraphicsIfexists) {
+            /// update collision objects
+            for (int i = 0; i < as->getVisColOb().size(); i++) {
+                as.alternateVisual()[i]->setVisibility(true);
+                pos = std::get<1>(as->getVisColOb()[i]);
+                as.alternateVisual()[i]->setPos(
+                        pos[0],
+                        pos[1],
+                        pos[2]);
+                rotMatToQuat(std::get<0>(as->getVisColOb()[i]), quat);
+                as.alternateVisual()[i]->setOri(quat.v[0], quat.v[1], quat.v[2], quat.v[3]);
+                adjustTransparency(as.alternateVisual()[i], as.hidable);
+            }
+
+            for (int i = 0; i < as->getVisOb().size(); i++)
+                as.visual()[i]->setVisibility(false);
+
+        } else {
+            for (int i = 0; i < as->getVisOb().size(); i++) {
+                as.visual()[i]->setVisibility(true);
+                if (!as.visual()[i]->isVisible()) continue;
+                pos = std::get<1>(as->getVisOb()[i]);
+                color = std::get<4>(as->getVisOb()[i]);
+                as.visual()[i]->setPos(
+                        pos[0],
+                        pos[1],
+                        pos[2]
+                );
+                rotMatToQuat(std::get<0>(as->getVisOb()[i]), quat);
+                as.visual()[i]->setOri(quat.v[0], quat.v[1], quat.v[2], quat.v[3]);
+                as.visual()[i]->setColor({float(color[0]),
+                                          float(color[1]),
+                                          float(color[2])});
+                as.visual()[i]->setTransparency(float(color[3]));
+                adjustTransparency(as.visual()[i], as.hidable);
+            }
+            for (int i = 0; i < as->getVisColOb().size(); i++)
+                as.alternateVisual()[i]->setVisibility(false);
+        }
     }
+
 
     benchmark::Vec<3> bodyPosition;
     benchmark::Vec<4> quat;
@@ -232,5 +275,43 @@ benchmark::SingleBodyHandle PyXSim::addCapsule(double radius,
                                                int geomid) {
     object::PyXCapsule* capsule = world_->addCapsule(radius,height,mass,{0.0f,0.0f,0.0f});
     benchmark::SingleBodyHandle handle(capsule,{},{});
+    return handle;
+}
+
+ArticulatedSystemHandle  PyXSim::addArticulatedSystem(physx_sim::object::PyXArticulatedSystem* articulatedSystem){
+
+    ArticulatedSystemHandle handle(
+             articulatedSystem, {}, {});
+    if(!gui_) {
+        asHandles_.push_back(handle);
+        return handle;
+    }
+
+    for (int i = 0; i < handle->visObj.size(); i++) {
+        switch (std::get<3>(handle->visObj[i])) {
+            case benchmark::object::Shape::Box:
+                handle.visual().push_back(new rai_graphics::object::Box(handle->visProps_[i].second.v[0],
+                                                                        handle->visProps_[i].second.v[1],
+                                                                        handle->visProps_[i].second.v[2], true));
+                break;
+            case benchmark::object::Shape::Cylinder:
+                handle.visual().push_back(new rai_graphics::object::Cylinder(handle->visProps_[i].second.v[0],
+                                                                             handle->visProps_[i].second.v[1], true));
+                break;
+            case benchmark::object::Shape::Sphere:
+                handle.visual().push_back(new rai_graphics::object::Sphere(handle->visProps_[i].second.v[0], true));
+                break;
+            case benchmark::object::Shape::Mesh:
+                checkFileExistance(handle->visProps_[i].first);
+                handle.visual().push_back(new rai_graphics::object::Mesh(handle->visProps_[i].first,
+                                                                         handle->visProps_[i].second.v[0]));
+                break;
+        }
+        handle.visual().back()->setColor({float(std::get<4>(handle->visObj[i]).v[0]),
+                                          float(std::get<4>(handle->visObj[i]).v[1]),
+                                          float(std::get<4>(handle->visObj[i]).v[2])});
+        processGraphicalObject(handle.visual().back(), std::get<2>(handle->visObj[i]));
+    }
+    asHandles_.push_back(handle);
     return handle;
 }

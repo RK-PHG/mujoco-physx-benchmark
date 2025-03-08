@@ -100,6 +100,8 @@ public:
                                            int bodyId,
                                            int geomid) override ;
 
+    ArticulatedSystemHandle addArticulatedSystem(physx_sim::object::PyXArticulatedSystem* articulatedSystem);
+
     std::vector<physx_sim::ArticulatedSystemHandle> asHandles_;
 
 };

@@ -268,6 +268,8 @@ object::PyXArticulatedSystem* PyXWorld::loadModel(std::string modelPath) {
     object::PyXArticulatedSystem* articulatedSystem = new object::PyXArticulatedSystem(articulation);
     articulatedSystemList_.push_back(articulatedSystem);
 
+    articulatedSystem->initVisual();
+
     return articulatedSystem;
 
 }

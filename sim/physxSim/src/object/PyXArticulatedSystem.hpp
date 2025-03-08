@@ -63,6 +63,8 @@ namespace physx_sim{
 
             void updateVisuals();
 
+            void initVisual();
+
         private:
             benchmark::Vec<3> linearMomentum_;
             physx::PxArticulationReducedCoordinate* articulation_;
@@ -70,7 +72,7 @@ namespace physx_sim{
             int dof_ = 0;
             int stateDimension_ = 0;
             bool isFixed_ = false;
-            void initVisual(physx::PxArticulationReducedCoordinate* articulation);
+
         };
     }
 }

@@ -30,6 +30,7 @@ void setupWorld() {
 
   // 添加关节系统
   physx_sim::object::PyXArticulatedSystem* anymal = sim->world_->loadModel(benchmark::anymal::zerogravity::getURDFpath());
+  sim->addArticulatedSystem(anymal);
   anymals.push_back(anymal);
 
   // 设置关节初始位置
