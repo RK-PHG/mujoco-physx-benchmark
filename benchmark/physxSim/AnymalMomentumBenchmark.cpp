@@ -8,16 +8,11 @@ po::options_description desc;
 std::vector<benchmark::SingleBodyHandle> balls;
 std::vector<physx_sim::object::PyXArticulatedSystem*> anymals;
 
-const PxVec3 gCamEyeLift(-5.858525f, 6.079476f, 1.546743f);
-const PxVec3 gCamDirLift(0.927923f, -0.356565f, -0.108720f);
-
-
 void setupSimulation() {
 
     sim = new physx_sim::PyXSim(800, 600, 0.5,
                                 benchmark::NO_BACKGROUND);
 
-    /** timeStep and max contact */
     sim->setTimeStep(0.1);
 
 }
