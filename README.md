@@ -1,24 +1,3 @@
-#### dependencies
+# Mujoco-PhysX Benchmark
 
-1. libeigen3-dev
-2. libboost-all-dev
-3. libglew-dev
-4. libglm-dev
-5. libsdl2-dev 
-6. libassimp-dev 
-7. libsoil-dev 
-8. libsdl2-ttf-dev 
-9. liburdfdom-dev 
-10. libgtest-dev 
-11. google-perftools 
-12. libgoogle-perftools-dev 
-13. libpng-dev 
-14. libfcl-dev 
-15. libccd-dev 
-16. libncurses5-dev 
-17. libncursesw5-dev 
-18. doxygen 
-19. coinor-libipopt-dev 
-20. libnlopt-dev 
-21. libflann-dev 
-22. libtinyxml2-dev
+This repository provides a testing platform for comparing MuJoCo and PhysX. It includes a unified benchmarking tool and a GUI interface for easy analysis.
