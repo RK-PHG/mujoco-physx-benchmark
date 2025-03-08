@@ -107,15 +107,8 @@ int main(int argc, const char* argv[]) {
     RAIINFO(
             std::endl << "=======================" << std::endl
                       << "Simulator  : " << "Physx" << std::endl
-//                      << "GUI        : " << benchmark::anymal::zerogravity::options.gui << std::endl
-//                      << "Solver     : " << "solver" << std::endl
-//                      << "Integrator : " << "Integrator" << std::endl
-                      << "Timestep   : " << benchmark::anymal::zerogravity::options.dt << std::endl
                       << "-----------------------"
     )
-
-
-
 
     // trial1: get Error
     setupSimulation();

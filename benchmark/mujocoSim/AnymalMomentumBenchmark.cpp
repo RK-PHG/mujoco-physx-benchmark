@@ -1,7 +1,3 @@
-//
-// Created by kangd on 14.05.18.
-//
-
 #include <MjcSim.hpp>
 
 #include "AnymalMomentumBenchmark.hpp"

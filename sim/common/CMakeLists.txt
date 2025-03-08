@@ -1,9 +1,5 @@
 message(STATUS "  commonSim for common parts")
 
-########################################################################################################################
-# dependencies
-
-# raigraphics
 set(ex_raigraphics_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../lib/raigraphics")
 set(raigraphics_include_dir "${ex_raigraphics_SOURCE_DIR}/include/")
 set(raigraphics_lib_dir "${ex_raigraphics_SOURCE_DIR}/lib/")
@@ -13,8 +9,6 @@ set(raicommon_include_dir "${ex_raicommon_SOURCE_DIR}/include/")
 set(raicommon_lib_dir "${ex_raicommon_SOURCE_DIR}/lib/")
 
 
-########################################################################################################################
-# source
 set(CommonSrc
         UserHandle.hpp
         WorldRG.hpp
@@ -27,8 +21,6 @@ set(CommonSrc
         interface/SingleBodyObjectInterface.hpp
         )
 
-########################################################################################################################
-# library
 find_library(RAIGRAPHICS_LIB
         NAMES raigraphics
         PATHS ${raigraphics_lib_dir}

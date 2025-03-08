@@ -6,48 +6,6 @@ set(ex_dart_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../lib/dart")
 set(dart_include_dir "${ex_dart_SOURCE_DIR}/include/")
 set(dart_lib_dir "${ex_dart_SOURCE_DIR}/lib/")
 
-#find_library(DART
-#        NAMES       libdart.so
-#        PATHS       ${dart_lib_dir}
-#        NO_DEFAULT_PATH
-#        )
-#
-#find_library(DART_IO
-#        NAMES     libdart-io.so
-#        PATHS     ${dart_lib_dir}
-#        NO_DEFAULT_PATH
-#        )
-#
-#find_library(DART_IO_URDF
-#        NAMES     libdart-io-urdf.so
-#        PATHS     ${dart_lib_dir}
-#        NO_DEFAULT_PATH
-#        )
-#
-#find_library(DART_COLLISION_BULLET
-#        NAMES     libdart-collision-bullet.so
-#        PATHS     ${dart_lib_dir}
-#        NO_DEFAULT_PATH
-#        )
-#
-#find_library(DART_COLLISION_ODE
-#        NAMES     libdart-collision-ode.so
-#        PATHS     ${dart_lib_dir}
-#        NO_DEFAULT_PATH
-#        )
-
-#find_package(DART
-#        CONFIG
-#        PATHS           "${dart_lib_dir}"
-#        COMPONENTS
-#        io
-#        io-urdf
-#        collision-bullet
-#        collision-ode
-#        NO_DEFAULT_PATH
-#        )
-
-
 # raigraphics
 set(ex_raigraphics_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../lib/raigraphics")
 set(raigraphics_include_dir "${ex_raigraphics_SOURCE_DIR}/include/")

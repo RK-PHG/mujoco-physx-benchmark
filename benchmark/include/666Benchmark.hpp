@@ -238,7 +238,6 @@ namespace benchmark::sixsixsix {
 
         // save video
         if(vm.count("video")) {
-            RAIFATAL_IF(!options.gui, "GUI should be on to save a video")
             options.saveVideo = true;
         }
 

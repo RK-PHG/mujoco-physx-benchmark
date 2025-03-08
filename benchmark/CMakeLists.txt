@@ -33,8 +33,6 @@ find_library(rai_common_timer_LIB
         NO_DEFAULT_PATH
         )
 
-########################################################################################################################
-# source
 set(benchmarkHeaders
         "include/666Benchmark.hpp"
         "include/AnymalEnergyBenchmark.hpp"
@@ -50,14 +48,9 @@ set(benchmarkHeaders
 
  
 include_directories("include")
-  
-########################################################################################################################
-# macro variable
+
 add_definitions(-DBENCHMARKROOTPATH="${CMAKE_CURRENT_SOURCE_DIR}")
 add_definitions(-DBENCHMARKYAMLPATH="${CMAKE_CURRENT_SOURCE_DIR}/res/yaml")
-
-########################################################################################################################
-# library
 
 add_library(benchmark INTERFACE)
 
@@ -81,9 +74,6 @@ target_link_libraries(benchmark
         ${rai_common_logger_LIB}
         ${rai_common_timer_LIB}
         )
-
-########################################################################################################################
-# scripts
 
 file(COPY res/shell/anymal-pd.sh
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
@@ -116,9 +106,6 @@ file(COPY res/shell/selectsim.sh
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 configure_file(sim.sh.in ${CMAKE_CURRENT_BINARY_DIR}/sim.sh @ONLY)
-
-########################################################################################################################
-# sub-directories
 
 message(STATUS "Build benchmark tests:")
 

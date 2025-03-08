@@ -57,23 +57,17 @@ find_library(PhysXPvdSDK_static_64_LIB
         NO_DEFAULT_PATH
         )
 
-
-# check dependencies
 if(NOT TARGET commonSim)
     message(WARNING "Cannot find dependency. Stop build physxSim")
     return()
 endif()
 
-########################################################################################################################
-# flags
 set(CMAKE_CXX_FLAGS_DEBUG
         "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG -Wl,--no-as-needed -O0 -mtune=native -march=native")
 
 set(CMAKE_CXX_FLAGS_RELEASE
         "-Wl,--no-as-needed -O3 -mtune=native -march=native")
 
-########################################################################################################################
-# source
 include_directories(src)
 
 set(pyXSimSrc
@@ -98,9 +92,6 @@ set(pyXSimSrc
         src/object/PyXCylinder.hpp
         )
 
-
-########################################################################################################################
-# library
 add_library(physxSim
         STATIC
         ${pyXSimSrc})
@@ -115,12 +106,12 @@ target_include_directories(physxSim
         ${physx_include_dir}
         ${raigraphics_include_dir}
         )
-#
+
 find_library(RAIGRAPHICS_LIB
         NAMES       raigraphics
         PATHS       ${raigraphics_lib_dir}
         )
-#
+
 if(NOT RAIGRAPHICS_LIB)
     message(FATAL_ERROR "Could not find raigraphics library.")
 endif()
