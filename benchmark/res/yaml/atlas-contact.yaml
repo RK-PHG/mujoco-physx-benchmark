@@ -1,0 +1,42 @@
+---
+# simulation properties
+sim_properties:
+  light_position: [0.0, 10.0, 10.0]
+
+# solver parameters
+#solver_params:
+#  raiSim:
+#    erp: 0.2    # when erp_on = true
+#  bullet:
+#    erp: 0.2              # when erp_on = true
+#    erp2: 0.1             # when erp_on = true
+#    erp_friction: 0.01    # when erp_on = true
+#  ode:
+#    erp: 0.2    # when erp_on = true
+
+# simulation constants
+constant:
+  H: 1.0
+  dt: 0.0005
+  T: 25
+#  T: 5
+  g: -9.81
+#  baseQuat: [0.7071, 0, -0.7071, 0]
+  baseQuat: [1, 0, 0, 0]
+  kp: [
+  0, 0, 0, 0, 0, 0,
+  10000,10000,10000,
+  20000,10000,1000,1000,1000,100,.2,
+  20000,10000,1000,1000,1000,100,.2,
+  20000,50000,50000,30000,10000,20000,
+  20000,50000,50000,30000,10000,20000
+  ]
+  kd: [
+  0, 0, 0, 0, 0, 0,
+  50, 50, 50,
+  30, 10, 10, 5, 3, 0.5, .01,
+  30, 10, 10, 5, 3, 0.5, .01,
+  40, 40, 40, 5, 2, 10,
+  40, 40, 40, 5, 2, 10
+  ]
+...
