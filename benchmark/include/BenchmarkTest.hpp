@@ -1,5 +1,3 @@
-/** 这个文件定义了 benchmarkTest 的一些基本属性 */
-
 #ifndef BENCHMARK_BENCHMARK_HPP
 #define BENCHMARK_BENCHMARK_HPP
 
@@ -42,16 +40,13 @@ struct Option {
   bool plot = false;
 };
 
-/**
- *  定义了运行测试的一些选项
- */
 void addDescToOption(po::options_description &desc) {
   desc.add_options()
       ("help", "produce help message")  // help
-      ("nogui", "no visualization")     // gui 选项
-      ("log", "create log files")       // log 选项
-      ("video", "save a video file (only available when gui is on)")    // 录制视频
-      ("csv", po::value<std::string>(), "name of csv file (save csv when this option is given)") // 打印csv
+      ("nogui", "no visualization")     // gui
+      ("log", "create log files")       // log
+      ("video", "save a video file (only available when gui is on)")
+      ("csv", po::value<std::string>(), "name of csv file (save csv when this option is given)")
       ;
 }
 

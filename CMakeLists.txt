@@ -21,7 +21,7 @@ else ()
 endif()
 
 option(MUJOCO "benchmark MUJOCO" ON)
-option(PHYSX "benchmark PHYSX" OFF)
+option(PHYSX "benchmark PHYSX" ON)
 
 option(BUILD_BENCHMARK "build benchmark tests" ON)
 message(STATUS "Benchmark the following physics engines:")

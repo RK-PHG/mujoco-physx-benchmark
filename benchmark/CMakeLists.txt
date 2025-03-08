@@ -35,15 +35,8 @@ find_library(rai_common_timer_LIB
 
 set(benchmarkHeaders
         "include/666Benchmark.hpp"
-        "include/AnymalEnergyBenchmark.hpp"
         "include/AnymalMomentumBenchmark.hpp"
-        "include/AnymalPDBenchmark.hpp"
-        "include/AtlasContactBenchmark.hpp"
         "include/BenchmarkTest.hpp"
-        "include/BouncingBenchmark.hpp"
-        "include/Elastic666Benchmark.hpp"
-        "include/KaplaBenchmark.hpp"
-        "include/RollingBenchmark.hpp"
         )
 
  

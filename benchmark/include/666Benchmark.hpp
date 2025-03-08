@@ -1,5 +1,3 @@
-/** 定义了666测试一些必须函数，包括定义测试选项，加载参数，计算平均误差等 */
-
 #ifndef BENCHMARK_THOUSANDBENCHMARK_HPP
 #define BENCHMARK_THOUSANDBENCHMARK_HPP
 
