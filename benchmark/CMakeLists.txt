@@ -68,32 +68,13 @@ target_link_libraries(benchmark
         ${rai_common_timer_LIB}
         )
 
-file(COPY res/shell/anymal-pd.sh
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-file(COPY res/shell/rolling.sh
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-file(COPY res/shell/kapla.sh
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
 file(COPY res/shell/666.sh
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-file(COPY res/shell/bouncing.sh
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-file(COPY res/shell/666-elastic.sh
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 file(COPY res/shell/anymal-momentum.sh
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-file(COPY res/shell/anymal-energy.sh
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-file(COPY res/shell/atlas-contact.sh
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 file(COPY res/shell/selectsim.sh
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
