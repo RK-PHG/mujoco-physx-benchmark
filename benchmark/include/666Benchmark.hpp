@@ -21,40 +21,18 @@ namespace ru = rai::Utils;
 
 namespace benchmark::sixsixsix {
 
-    /**
-    * options for building simulation
-    */
     struct Option: benchmark::Option {
-        // 是否开启erp
+
         bool erpYN = false;
 
-        /**
-         * @brief 时间步长。
-         *
-         * 表示每次模拟迭代的时间间隔，单位为秒。
-         */
         double dt = 0.01;
 
-        /**
-          * @brief 模拟总时间。
-          *
-          * 表示整个模拟过程的持续时间，单位为秒。
-          */
         double T = 10.0;
 
-        /**
-            * @brief 是否启用弹性碰撞。
-            *
-            * 如果为 true，进行弹性碰撞测试；否则进行非弹性碰撞测试。
-            */
-        bool elasticCollision = false;   /// for elastic collision test
+        bool elasticCollision = false;
     };
     Option options;
 
-/**
- * 构建仿真参数
- * 这些参数可以通过 YAML 文件设置
- */
     struct Parameter {
 
         // sim properties

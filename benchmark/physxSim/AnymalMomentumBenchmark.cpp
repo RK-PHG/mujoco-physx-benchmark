@@ -18,10 +18,9 @@ void setupSimulation() {
 }
 
 void setupWorld() {
-  // 添加平面
+
   auto checkerboard = sim->addCheckerboard(2, 100, 100, 0.1, bo::BOX_SHAPE, 1, -1, bo::GRID);
 
-  // 添加球
   auto ball = sim->addSphere(0.2, benchmark::anymal::zerogravity::params.m, 0, 0);
   ball->setPosition(0,
                     benchmark::anymal::zerogravity::params.x0,
