@@ -1,5 +1,3 @@
-/** 关节系统 */
-
 #ifndef SIM_BENCHMARK_PYXARTICULATEDSYSTEM_HPP
 #define SIM_BENCHMARK_PYXARTICULATEDSYSTEM_HPP
 
@@ -66,11 +64,17 @@ namespace physx_sim{
             void initVisual();
 
         private:
+
             benchmark::Vec<3> linearMomentum_;
+
             physx::PxArticulationReducedCoordinate* articulation_;
+
             physx::PxMaterial* material_;
+
             int dof_ = 0;
+
             int stateDimension_ = 0;
+
             bool isFixed_ = false;
 
         };

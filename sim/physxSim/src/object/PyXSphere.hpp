@@ -1,5 +1,3 @@
-/** phXSphere的定义 */
-
 #ifndef SIMBENCHMARK_PYXSPHERE_HPP
 #define SIMBENCHMARK_PYXSPHERE_HPP
 
@@ -9,7 +7,6 @@
 namespace physx_sim{
 namespace object{
 
-    /** 球体类型 */
     class PyXSphere: public PyXSingleBodyObject {
 
     public:

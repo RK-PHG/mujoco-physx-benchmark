@@ -105,7 +105,6 @@ int main(int argc, const char* argv[]) {
                       << "-----------------------"
     )
 
-    // trial1: get Error
     setupSimulation();
     setupWorld();
     double time = simulationLoop(true, true);

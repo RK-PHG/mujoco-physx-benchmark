@@ -123,7 +123,6 @@ namespace physx_sim {
 
         void integrate2(double dt) override {}
 
-        /** 其他功能函数 */
         double getKineticEnergy();
 
         double getPotentialEnergy(const benchmark::Vec<3> &gravity);
@@ -142,14 +141,12 @@ namespace physx_sim {
 
         int getWorldNumContacts();
 
-        /** the functions below are articulated system related. */
         PxArticulationLink *addLink(PxArticulationReducedCoordinate *articulation, PxArticulationLink *parent,
                                     tinyxml2::XMLElement *linkElement,
                                     std::unordered_map <std::string, std::vector<float>> &materials);
 
     public:
 
-        /** physx引擎相关变量 */
         PxPvd *pvd_;
         PxDefaultAllocator allocator_;
         PxDefaultErrorCallback errorCallback_;
@@ -157,29 +154,16 @@ namespace physx_sim {
         physx::PxPhysics* physics_;
         physx::PxScene * scene_;
         physx::PxDefaultCpuDispatcher* dispatcher_;
-
-        /** 关节系统列表 */
         std::vector<object::PyXArticulatedSystem*> articulatedSystemList_;
-
-        /** 单体物体列表 */
         std::vector<object::PyXSingleBodyObject*> objectList_;
-
-        /** 接触问题列表 */
         std::vector<Single3DContactProblem> contactProblemList_;
-
-        /** 广义坐标、广义速度、广义力矩 */
         benchmark::VecDyn generalizedCoordinate_;
         benchmark::VecDyn generalizedVelocity_;
         benchmark::VecDyn generalizedForce_;
-
-        /** 线性动量 */
         benchmark::Vec<3> linearMomentum_;
-
-        /** 时间步长 */
         double timeStep_;
     };
 
-    /** 定义一个回调类，用于接收接触信息 */
     class CollisionCallback : public PxSimulationEventCallback {
     public:
         CollisionCallback(physx_sim::PyXWorld* world):world_(world){}
@@ -187,10 +171,8 @@ namespace physx_sim {
             world_->contactProblemList_.clear();
 
             for (PxU32 i = 0; i < nbPairs; ++i) {
+
                 const PxContactPair& contactPair = pairs[i];
-
-                PxU32 contactCount = contactPair.contactCount;
-
                 PxContactPairPoint contactPoints[16];
                 PxU32 extractedPoints = contactPair.extractContacts(contactPoints, 16);
 

@@ -1,5 +1,3 @@
-/** 实现Physx的世界接口 */
-
 #include "PyXWorld.hpp"
 #include <queue>
 #include <unordered_map>
@@ -8,10 +6,8 @@
 using namespace physx_sim;
 using namespace std;
 
-// 辅助函数，欧拉角转四元数
 PxQuat eulerToQuaternion(float roll, float pitch, float yaw) {
 
-    // 将欧拉角转换为四元数
     float cy = cos(yaw * 0.5f);
     float sy = sin(yaw * 0.5f);
     float cp = cos(pitch * 0.5f);
@@ -19,35 +15,31 @@ PxQuat eulerToQuaternion(float roll, float pitch, float yaw) {
     float cr = cos(roll * 0.5f);
     float sr = sin(roll * 0.5f);
 
-    // 四元数的计算公式
     return PxQuat(
             cy * cp * cr + sy * sp * sr,  // w
             cy * cp * sr - sy * sp * cr,  // x
             sy * cp * cr + cy * sp * sr,  // y
             sy * cp * sr - cy * sp * cr   // z
     );
-
 }
 
-// 辅助函数，从rootElement中获取某个name的link节点
 tinyxml2::XMLElement *getLinkByName(tinyxml2::XMLElement *root, const char *name) {
-    // 遍历所有link元素
+
     for (tinyxml2::XMLElement *linkElement = root->FirstChildElement(
             "link"); linkElement; linkElement = linkElement->NextSiblingElement("link")) {
-        // 获取link元素的name属性
+
         const char *linkName = linkElement->Attribute("name");
         if (linkName && strcmp(linkName, name) == 0) {
-            // 如果name属性匹配，返回该link元素
             return linkElement;
         }
+
     }
 
-    // 如果没有找到匹配的link元素，返回nullptr
     return nullptr;
 }
 
-// 辅助函数，从root中找到所有以name为父节点的关节
 vector<tinyxml2::XMLElement *> getRelatedJoints(tinyxml2::XMLElement *root, const char *parentName) {
+
     vector<tinyxml2::XMLElement *> relatedJoints;
 
     // 遍历所有的 <joint> 元素
@@ -64,7 +56,6 @@ vector<tinyxml2::XMLElement *> getRelatedJoints(tinyxml2::XMLElement *root, cons
             }
         }
     }
-
     return relatedJoints;
 }
 
@@ -129,6 +120,7 @@ PxArticulationLink *PyXWorld::addLink(PxArticulationReducedCoordinate *articulat
         PxBoxGeometry boxGeometry(PxVec3(size[0], size[1], size[2]));
         PxRigidActorExt::createExclusiveShape(*newLink, boxGeometry, *material);
     }
+
     // 球体
     else if (strcmp(type, "sphere") == 0) {
         float radius;
@@ -136,6 +128,7 @@ PxArticulationLink *PyXWorld::addLink(PxArticulationReducedCoordinate *articulat
         PxSphereGeometry sphereGeometry(radius);
         PxRigidActorExt::createExclusiveShape(*newLink, sphereGeometry, *material);
     }
+
     // 圆柱体（使用胶囊体近似）
     else if (strcmp(type, "cylinder") == 0) {
         float length, radius;
@@ -163,7 +156,7 @@ PxArticulationLink *PyXWorld::addLink(PxArticulationReducedCoordinate *articulat
         // 获取质量
         float mass = 0.0f;
         inertialElement->FirstChildElement("mass")->QueryFloatAttribute("value", &mass);
-        PxRigidBodyExt::updateMassAndInertia(*newLink, 10.0f);
+        PxRigidBodyExt::updateMassAndInertia(*newLink, 1.0f);
     }
 
     return newLink;
@@ -279,34 +272,18 @@ object::PyXArticulatedSystem* PyXWorld::loadModel(std::string modelPath) {
  * */
 PyXWorld::PyXWorld() {
 
-    // foundation 对象初始化
+
     foundation_ = PxCreateFoundation(PX_PHYSICS_VERSION, allocator_, errorCallback_);
-
-    // pvd
     physx::PxPvdTransport *mTransport = physx::PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
-
-    // mPvd Flags
     physx::PxPvdInstrumentationFlags mPvdFlags = physx::PxPvdInstrumentationFlag::eALL;
-
     pvd_ = physx::PxCreatePvd(*foundation_);
-
     bool success = pvd_->connect(*mTransport, mPvdFlags);
-
-    // physics 对象初始化
     physics_ = PxCreatePhysics(PX_PHYSICS_VERSION, *foundation_, PxTolerancesScale(), true, pvd_);
-
-    // 场景属性
     PxSceneDesc sceneDesc(physics_->getTolerancesScale());
-
-    // 初始化重力加速度
     sceneDesc.gravity = PxVec3(0.0f, -9.80f, 0.0f);
-
-    // dispatcher
     dispatcher_ = PxDefaultCpuDispatcherCreate(2);
     sceneDesc.cpuDispatcher = dispatcher_;
     sceneDesc.filterShader = PxDefaultSimulationFilterShader;
-
-    // 创建场景
     scene_ = physics_->createScene(sceneDesc);
 
     PxPvdSceneClient *pvdClient = scene_->getScenePvdClient();

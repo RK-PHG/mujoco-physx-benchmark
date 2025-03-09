@@ -437,6 +437,8 @@ void physx_sim::object::PyXArticulatedSystem::initVisual() {
             physx::PxTransform shapeLocalPose = shape->getLocalPose();
             physx::PxTransform globalPose = linkPose * shapeLocalPose;
 
+            std::cout << globalPose.p.x << ", " << globalPose.p.y << ", " << globalPose.p.z << std::endl;
+
             // 转换旋转矩阵
             Eigen::Quaterniond quat(
                     globalPose.q.w,
@@ -489,7 +491,6 @@ void physx_sim::object::PyXArticulatedSystem::initVisual() {
                 }
                 case physx::PxGeometryType::eTRIANGLEMESH:
                 case physx::PxGeometryType::eCONVEXMESH:
-                    // 默认不处理mesh
                     break;
                 default:
                 RAIFATAL("not supported shape");

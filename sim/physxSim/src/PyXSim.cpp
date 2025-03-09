@@ -15,12 +15,11 @@ void PyXSim::updateFrame() {
         benchmark::Vec<3> pos;
         benchmark::Vec<4> color;
 
-        // update visuals for articulated system
         as->updateVisuals();
         std::cout << as.visual().size() << std::endl;
 
         if (showAlternateGraphicsIfexists) {
-            /// update collision objects
+
             for (int i = 0; i < as->getVisColOb().size(); i++) {
                 as.alternateVisual()[i]->setVisibility(true);
                 pos = std::get<1>(as->getVisColOb()[i]);
