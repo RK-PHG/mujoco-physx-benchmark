@@ -22,7 +22,6 @@ using namespace physx;
 
 namespace physx_sim {
 
-    /** 求解器选项 */
     enum SolverOption {
         SOLVER_PGS,
         SOLVER_CG,
@@ -32,7 +31,6 @@ namespace physx_sim {
     typedef Eigen::Map<Eigen::Matrix<double,-1,1>> EigenVec;
     typedef Eigen::Map<Eigen::Matrix<double,-1,-1>> EigenMat;
 
-    /** 接触点信息 */
     struct Single3DContactProblem {
         Single3DContactProblem(const double x, const double y, const double z) {
             point_ = {x, y, z};
@@ -42,9 +40,7 @@ namespace physx_sim {
         double force_;
     };
 
-    /**
-     * @brief PyXWorld类，用于实现 physx 引擎的世界接口
-     * */
+
     class PyXWorld : benchmark::WorldInterface {
 
         friend class PyXSim;
@@ -52,29 +48,22 @@ namespace physx_sim {
 
     public:
 
-        // 无参构造函数，完成scene等physx内置变量的初始化
         PyXWorld();
 
-        // 析构
         virtual ~PyXWorld();
 
-        // 加载模型
         object::PyXArticulatedSystem* loadModel(std::string modelPath);
 
-        // 向场景中添加一个球体
         object::PyXSphere *addSphere(double radius, double mass, benchmark::Vec<3> pos = {0.0, 0.0, 0.0});
 
-        // 向场景中添加一个盒体
         object::PyXBox *addBox(double xLength,
                                double yLength,
                                double zLength,
                                double mass,
                                benchmark::Vec<3> pos = {0.0, 0.0, 0.0});
 
-        // 向场景中添加平面
         object::PyXCheckerBoard *addCheckerboard(benchmark::Vec<3> pos={0.0,1.0,0.0});
 
-        // 添加胶囊体
         object::PyXCapsule *addCapsule(double radius,
                                        double height,
                                        double mass,
@@ -195,29 +184,23 @@ namespace physx_sim {
     public:
         CollisionCallback(physx_sim::PyXWorld* world):world_(world){}
         void onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs) override {
-            // 清空之前的接触列表
             world_->contactProblemList_.clear();
 
             for (PxU32 i = 0; i < nbPairs; ++i) {
                 const PxContactPair& contactPair = pairs[i];
 
-                // 获取接触点数量
                 PxU32 contactCount = contactPair.contactCount;
 
-                // 提取接触点信息
                 PxContactPairPoint contactPoints[16];
                 PxU32 extractedPoints = contactPair.extractContacts(contactPoints, 16);
 
-                // 遍历每个接触点并重写 contactProblemList_
                 for (PxU32 j = 0; j < extractedPoints; ++j) {
                     const PxVec3& position = contactPoints[j].position;
 
-                    // 创建接触问题并保存到 contactProblemList_
                     Single3DContactProblem contact(position.x, position.y, position.z);
                     contact.normal_ = Eigen::Vector3d(contactPoints[j].normal.x, contactPoints[j].normal.y, contactPoints[j].normal.z);
-                    contact.force_ = contactPoints[j].separation; // 可以根据需要设置力的值
+                    contact.force_ = contactPoints[j].separation;
 
-                    // 将接触问题添加到列表中
                     world_->contactProblemList_.push_back(contact);
                 }
             }

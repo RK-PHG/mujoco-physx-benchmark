@@ -1,5 +1,3 @@
-/** PyXSim */
-
 #ifndef SIMBENCHMARK_PYXSIM_HPP
 #define SIMBENCHMARK_PYXSIM_HPP
 

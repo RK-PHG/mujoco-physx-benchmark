@@ -163,7 +163,7 @@ PxArticulationLink *PyXWorld::addLink(PxArticulationReducedCoordinate *articulat
         // 获取质量
         float mass = 0.0f;
         inertialElement->FirstChildElement("mass")->QueryFloatAttribute("value", &mass);
-        PxRigidBodyExt::updateMassAndInertia(*newLink, 1.0f);
+        PxRigidBodyExt::updateMassAndInertia(*newLink, 10.0f);
     }
 
     return newLink;
@@ -187,7 +187,7 @@ object::PyXArticulatedSystem* PyXWorld::loadModel(std::string modelPath) {
 
     // 创建关节系统
     physx::PxArticulationReducedCoordinate *articulation = physics_->createArticulationReducedCoordinate();
-    articulation->setArticulationFlag(PxArticulationFlag::eFIX_BASE, true);
+    articulation->setArticulationFlag(PxArticulationFlag::eFIX_BASE, false);
     articulation->setSolverIterationCounts(1000, 50);
     articulation->setMaxCOMLinearVelocity(5.0f);  // 设置最大质心速度为 5 m/s
 

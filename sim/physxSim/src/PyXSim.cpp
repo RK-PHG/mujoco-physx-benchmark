@@ -60,7 +60,6 @@ void PyXSim::updateFrame() {
         }
     }
 
-
     benchmark::Vec<3> bodyPosition;
     benchmark::Vec<4> quat;
 
@@ -88,7 +87,6 @@ void PyXSim::updateFrame() {
         }
     }
 
-    /// frames and COM
     if (gui_->getCustomToggleState(4)) {
 
         frameX_->mutexLock();
@@ -185,32 +183,26 @@ int PyXSim::getNumObject(){
     return world_->getNumObject();
 }
 
-/** 获取线性动量 */
 const Eigen::Map<Eigen::Matrix<double, 3, 1>> PyXSim::getLinearMomentumInCartesianSpace(){
     return world_->getLinearMomentumInCartesianSpace();
 }
 
-/** 获取总质量 */
 double PyXSim::getTotalMass(){
     return world_->getTotalMass();
 }
 
-/** 获取系统能量 */
 double PyXSim::getEnergy(const benchmark::Vec<3> &gravity){
     return world_->getEnergy(gravity);
 }
 
-/** 动能 */
 double PyXSim::getKineticEnergy(){
     return world_->getKineticEnergy();
 }
 
-/** 势能 */
 double PyXSim::getPotentialEnergy(const benchmark::Vec<3> &gravity){
     return  world_->getPotentialEnergy(gravity);
 }
 
-/** 添加球形 */
 benchmark::SingleBodyHandle PyXSim::addSphere(double radius,
                                               double mass,
                                               int bodyId,
@@ -234,7 +226,6 @@ benchmark::SingleBodyHandle PyXSim::addSphere(double radius,
     return handle;
 }
 
-/** 添加盒体 */
 benchmark::SingleBodyHandle PyXSim::addBox(double xLength,
                                            double yLength,
                                            double zLength,
@@ -246,7 +237,6 @@ benchmark::SingleBodyHandle PyXSim::addBox(double xLength,
     return handle;
 }
 
-/** 添加平面 */
 benchmark::SingleBodyHandle PyXSim::addCheckerboard(double gridSize,
                                                     double xLength,
                                                     double yLength,
@@ -267,7 +257,6 @@ benchmark::SingleBodyHandle PyXSim::addCheckerboard(double gridSize,
     return handle;
 }
 
-/** 添加胶囊体 */
 benchmark::SingleBodyHandle PyXSim::addCapsule(double radius,
                                                double height,
                                                double mass,
