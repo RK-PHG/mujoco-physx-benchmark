@@ -1,5 +1,3 @@
-/** PyXBox */
-
 #ifndef SIMBENCHMARK_PYXBOX_HPP
 #define SIMBENCHMARK_PYXBOX_HPP
 
@@ -8,7 +6,6 @@
 namespace physx_sim {
 namespace object {
 
-    /** 盒体 */
     class PyXBox : public PyXSingleBodyObject{
 
     public:

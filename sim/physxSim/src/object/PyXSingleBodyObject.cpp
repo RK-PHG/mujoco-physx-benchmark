@@ -77,7 +77,7 @@ namespace physx_sim{
          *
          * @return 物体的线速度，表示为三维向量。
          */
-        const benchmark::eVector3 PyXSingleBodyObject::getLinearVelocity() {
+        const   benchmark::eVector3 PyXSingleBodyObject::getLinearVelocity() {
             physx::PxVec3 lv = actor_->getLinearVelocity();
             linVelTemp_ = {lv.x,lv.y,lv.z};
             return linVelTemp_.e();

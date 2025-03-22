@@ -4,12 +4,184 @@
 
 using namespace physx_sim;
 
+PyXSim::PyXSim(int windowWidth,
+               int windowHeight,
+               float cms,
+               int flags) :
+        benchmark::WorldRG(windowWidth, windowHeight, cms, flags) {
+    world_ = new PyXWorld();
+}
+
+PyXSim::PyXSim() {
+    world_ = new PyXWorld();
+}
+
+PyXSim::PyXSim(const std::string &modelPath) {
+    world_ = new PyXWorld();
+    world_->loadModel(modelPath);
+}
+
+PyXSim::~PyXSim() {
+    delete world_;
+}
+
+/**
+ * 添加球
+ */
+benchmark::SingleBodyHandle PyXSim::addSphere(double radius,
+                                              double mass,
+                                              int bodyId,
+                                              int geomId){
+    object::PyXSphere* sphere = world_->addSphere(radius,mass,{0.0f,0.0f,0.0f});
+    benchmark::SingleBodyHandle handle(sphere, {}, {});
+
+    if (gui_) {
+        handle.visual().push_back(new rai_graphics::object::Sphere(radius, true));
+    }
+
+    sbHandles_.push_back(handle);
+
+    for (auto *go: handle.visual())
+        processGraphicalObject(go, 0);
+
+    for (auto *av: handle.alternateVisual())
+        processGraphicalObject(av, 0);
+
+    if(gui_) framesAndCOMobj_.push_back(handle.s_);
+    return handle;
+}
+
+/**
+ * 添加盒体
+ */
+benchmark::SingleBodyHandle PyXSim::addBox(double xLength,
+                                           double yLength,
+                                           double zLength,
+                                           double mass,
+                                           int bodyId,
+                                           int geomId) {
+    object::PyXBox *box = world_->addBox(xLength, yLength, zLength, mass, {0.0f, 0.0f, 0.0f});
+    benchmark::SingleBodyHandle handle(box, {}, {});
+
+    if (gui_) {
+        handle.visual().push_back(new rai_graphics::object::Box(xLength, yLength, zLength, true));
+    }
+
+    sbHandles_.push_back(handle);
+
+    for (auto *go: handle.visual()) {
+        processGraphicalObject(go, 0);
+    }
+
+    for (auto *av: handle.alternateVisual())
+        processGraphicalObject(av, 0);
+
+    if (gui_) framesAndCOMobj_.push_back(handle.s_);
+    return handle;
+}
+
+/**
+ * 添加地面
+ */
+benchmark::SingleBodyHandle PyXSim::addCheckerboard(double gridSize,
+                                                    double xLength,
+                                                    double yLength,
+                                                    double reflectanceI,
+                                                    bo::CheckerboardShape shape,
+                                                    int bodyId,
+                                                    int geomId,
+                                                    int flags){
+    object::PyXCheckerBoard* checkerBoard = world_->addCheckerboard(benchmark::Vec<3>({0.0f,0.0f,1.0f}));
+    benchmark::SingleBodyHandle handle(checkerBoard,{},{});
+    handle.hidable = false;
+    if(gui_) {
+        handle.visual().push_back(new rai_graphics::object::CheckerBoard(gridSize, xLength, yLength, reflectanceI));
+        static_cast<rai_graphics::object::CheckerBoard *>(handle.visual()[0])->gridMode = flags & bo::GRID;
+        gui_->addCheckerBoard(static_cast<rai_graphics::object::CheckerBoard *>(handle.visual()[0]));
+    }
+    sbHandles_.push_back(handle);
+    return handle;
+}
+
+/**
+ * 添加胶囊体
+ */
+benchmark::SingleBodyHandle PyXSim::addCapsule(double radius,
+                                               double height,
+                                               double mass,
+                                               int bodyId,
+                                               int geomid) {
+    object::PyXCapsule *capsule = world_->addCapsule(radius, height, mass, {0.0f, 0.0f, 0.0f});
+    benchmark::SingleBodyHandle handle(capsule, {}, {});
+
+    if (gui_) {
+        handle.visual().push_back(new rai_graphics::object::Capsule(radius, height, true));
+    }
+
+    sbHandles_.push_back(handle);
+
+    for (auto *go: handle.visual()) {
+        processGraphicalObject(go, 0);
+    }
+
+    for (auto *av: handle.alternateVisual())
+        processGraphicalObject(av, 0);
+
+    if (gui_) framesAndCOMobj_.push_back(handle.s_);
+    return handle;
+
+}
+
+/**
+ * 添加关节系统
+ */
+ArticulatedSystemHandle  PyXSim::addArticulatedSystem(physx_sim::object::PyXArticulatedSystem* articulatedSystem){
+
+    ArticulatedSystemHandle handle(
+            articulatedSystem, {}, {});
+    if(!gui_) {
+        asHandles_.push_back(handle);
+        return handle;
+    }
+
+    for (int i = 0; i < handle->visObj.size(); i++) {
+        switch (std::get<3>(handle->visObj[i])) {
+            case benchmark::object::Shape::Box:
+                handle.visual().push_back(new rai_graphics::object::Box(handle->visProps_[i].second.v[0],
+                                                                        handle->visProps_[i].second.v[1],
+                                                                        handle->visProps_[i].second.v[2], true));
+                break;
+            case benchmark::object::Shape::Cylinder:
+                handle.visual().push_back(new rai_graphics::object::Cylinder(handle->visProps_[i].second.v[0],
+                                                                             handle->visProps_[i].second.v[1], true));
+                break;
+            case benchmark::object::Shape::Sphere:
+                handle.visual().push_back(new rai_graphics::object::Sphere(handle->visProps_[i].second.v[0], true));
+                break;
+            case benchmark::object::Shape::Mesh:
+                checkFileExistance(handle->visProps_[i].first);
+                handle.visual().push_back(new rai_graphics::object::Mesh(handle->visProps_[i].first,
+                                                                         handle->visProps_[i].second.v[0]));
+                break;
+        }
+        handle.visual().back()->setColor({float(std::get<4>(handle->visObj[i]).v[0]),
+                                          float(std::get<4>(handle->visObj[i]).v[1]),
+                                          float(std::get<4>(handle->visObj[i]).v[2])});
+        processGraphicalObject(handle.visual().back(), std::get<2>(handle->visObj[i]));
+    }
+    asHandles_.push_back(handle);
+    return handle;
+}
+
+/**
+ * 更新显示帧，包括更新单体物体和机器人
+ */
 void PyXSim::updateFrame() {
 
     RAIFATAL_IF(!gui_, "use different constructor for visualization")
     const bool showAlternateGraphicsIfexists = gui_->getCustomToggleState(3);
 
-    for (auto &as : asHandles_) {
+    for (auto &as: asHandles_) {
 
         benchmark::Vec<4> quat;
         benchmark::Vec<3> pos;
@@ -62,7 +234,7 @@ void PyXSim::updateFrame() {
     benchmark::Vec<3> bodyPosition;
     benchmark::Vec<4> quat;
 
-    for (auto sb : sbHandles_) {
+    for (auto sb: sbHandles_) {
 
         sb->getPosition_W(bodyPosition);
         sb->getQuaternion(quat);
@@ -126,180 +298,67 @@ void PyXSim::updateFrame() {
         graphicalComMarker_->clearGhost();
     }
 
-    if(visualizerFlags_ & benchmark::DISABLE_INTERACTION)
+    if (visualizerFlags_ & benchmark::DISABLE_INTERACTION)
         return;
 }
 
-PyXSim::PyXSim(int windowWidth,
-                 int windowHeight,
-                 float cms,
-                 int flags) :
-        benchmark::WorldRG(windowWidth, windowHeight, cms, flags) {
-    world_ = new PyXWorld();
-}
-
-PyXSim::PyXSim() {
-    world_ = new PyXWorld();
-}
-
-PyXSim::PyXSim(const std::string &modelPath) {
-    world_ = new PyXWorld();
-    world_->loadModel(modelPath);
-}
-
-PyXSim::~PyXSim() {
-    delete world_;
-}
-
+// 静摩擦
 void PyXSim::setNoSlipParameter(double friction) {
     world_->setNoSlipParameter(friction);
 }
 
-void PyXSim::setGravity(Eigen::Vector3d gravity){
-    world_->setGravity(benchmark::Vec<3>({gravity.x(),gravity.y(),gravity.z()}));
+// 设置重力
+void PyXSim::setGravity(Eigen::Vector3d gravity) {
+    world_->setGravity(benchmark::Vec<3>({gravity.x(), gravity.y(), gravity.z()}));
 }
 
-void PyXSim::loop(double dt, double realTimeFactor){}
-
-void PyXSim::integrate(){
-    world_->integrate();
-}
-
-void PyXSim::setTimeStep(double timeStep){
+// 仿真步长
+void PyXSim::setTimeStep(double timeStep) {
     world_->setTimeStep(timeStep);
 }
 
-
-benchmark::SingleBodyHandle PyXSim::getSingleBodyHandle(int index){
-    return benchmark::SingleBodyHandle(world_->objectList_.at(index),{},{});
+// 获取单体的Handle
+benchmark::SingleBodyHandle PyXSim::getSingleBodyHandle(int index) {
+    return benchmark::SingleBodyHandle(world_->objectList_.at(index), {}, {});
 }
 
-int PyXSim::getWorldNumContacts(){
+// 获取接触点数量
+int PyXSim::getWorldNumContacts() {
     return world_->getWorldNumContacts();
 }
 
-int PyXSim::getNumObject(){
+// 获取单体数量
+int PyXSim::getNumObject() {
     return world_->getNumObject();
 }
 
-const Eigen::Map<Eigen::Matrix<double, 3, 1>> PyXSim::getLinearMomentumInCartesianSpace(){
+// 获取线性动量
+const Eigen::Map<Eigen::Matrix<double, 3, 1>> PyXSim::getLinearMomentumInCartesianSpace() {
     return world_->getLinearMomentumInCartesianSpace();
 }
 
-double PyXSim::getTotalMass(){
+// 获取总质量
+double PyXSim::getTotalMass() {
     return world_->getTotalMass();
 }
 
-double PyXSim::getEnergy(const benchmark::Vec<3> &gravity){
+// 获取系统总能量
+double PyXSim::getEnergy(const benchmark::Vec<3> &gravity) {
     return world_->getEnergy(gravity);
 }
 
-double PyXSim::getKineticEnergy(){
+// 获取系统动能
+double PyXSim::getKineticEnergy() {
     return world_->getKineticEnergy();
 }
 
-double PyXSim::getPotentialEnergy(const benchmark::Vec<3> &gravity){
-    return  world_->getPotentialEnergy(gravity);
+// 获取系统重力势能
+double PyXSim::getPotentialEnergy(const benchmark::Vec<3> &gravity) {
+    return world_->getPotentialEnergy(gravity);
 }
 
-benchmark::SingleBodyHandle PyXSim::addSphere(double radius,
-                                              double mass,
-                                              int bodyId,
-                                              int geomId){
-    object::PyXSphere* sphere = world_->addSphere(radius,mass,{0.0f,0.0f,0.0f});
-    benchmark::SingleBodyHandle handle(sphere, {}, {});
+void PyXSim::loop(double dt, double realTimeFactor) {}
 
-    if (gui_) {
-        handle.visual().push_back(new rai_graphics::object::Sphere(radius, true));
-    }
-
-    sbHandles_.push_back(handle);
-
-    for (auto *go: handle.visual())
-        processGraphicalObject(go, 0);
-
-    for (auto *av: handle.alternateVisual())
-        processGraphicalObject(av, 0);
-
-    if(gui_) framesAndCOMobj_.push_back(handle.s_);
-    return handle;
-}
-
-benchmark::SingleBodyHandle PyXSim::addBox(double xLength,
-                                           double yLength,
-                                           double zLength,
-                                           double mass,
-                                           int bodyId,
-                                           int geomId){
-    object::PyXBox* box = world_->addBox(xLength,yLength,zLength,mass,{0.0f,0.0f,0.0f});
-    benchmark::SingleBodyHandle handle(box,{},{});
-    return handle;
-}
-
-benchmark::SingleBodyHandle PyXSim::addCheckerboard(double gridSize,
-                                                    double xLength,
-                                                    double yLength,
-                                                    double reflectanceI,
-                                                    bo::CheckerboardShape shape,
-                                                    int bodyId,
-                                                    int geomId,
-                                                    int flags){
-    object::PyXCheckerBoard* checkerBoard = world_->addCheckerboard(benchmark::Vec<3>({0.0f,0.0f,1.0f}));
-    benchmark::SingleBodyHandle handle(checkerBoard,{},{});
-    handle.hidable = false;
-    if(gui_) {
-        handle.visual().push_back(new rai_graphics::object::CheckerBoard(gridSize, xLength, yLength, reflectanceI));
-        static_cast<rai_graphics::object::CheckerBoard *>(handle.visual()[0])->gridMode = flags & bo::GRID;
-        gui_->addCheckerBoard(static_cast<rai_graphics::object::CheckerBoard *>(handle.visual()[0]));
-    }
-    sbHandles_.push_back(handle);
-    return handle;
-}
-
-benchmark::SingleBodyHandle PyXSim::addCapsule(double radius,
-                                               double height,
-                                               double mass,
-                                               int bodyId,
-                                               int geomid) {
-    object::PyXCapsule* capsule = world_->addCapsule(radius,height,mass,{0.0f,0.0f,0.0f});
-    benchmark::SingleBodyHandle handle(capsule,{},{});
-    return handle;
-}
-
-ArticulatedSystemHandle  PyXSim::addArticulatedSystem(physx_sim::object::PyXArticulatedSystem* articulatedSystem){
-
-    ArticulatedSystemHandle handle(
-             articulatedSystem, {}, {});
-    if(!gui_) {
-        asHandles_.push_back(handle);
-        return handle;
-    }
-
-    for (int i = 0; i < handle->visObj.size(); i++) {
-        switch (std::get<3>(handle->visObj[i])) {
-            case benchmark::object::Shape::Box:
-                handle.visual().push_back(new rai_graphics::object::Box(handle->visProps_[i].second.v[0],
-                                                                        handle->visProps_[i].second.v[1],
-                                                                        handle->visProps_[i].second.v[2], true));
-                break;
-            case benchmark::object::Shape::Cylinder:
-                handle.visual().push_back(new rai_graphics::object::Cylinder(handle->visProps_[i].second.v[0],
-                                                                             handle->visProps_[i].second.v[1], true));
-                break;
-            case benchmark::object::Shape::Sphere:
-                handle.visual().push_back(new rai_graphics::object::Sphere(handle->visProps_[i].second.v[0], true));
-                break;
-            case benchmark::object::Shape::Mesh:
-                checkFileExistance(handle->visProps_[i].first);
-                handle.visual().push_back(new rai_graphics::object::Mesh(handle->visProps_[i].first,
-                                                                         handle->visProps_[i].second.v[0]));
-                break;
-        }
-        handle.visual().back()->setColor({float(std::get<4>(handle->visObj[i]).v[0]),
-                                          float(std::get<4>(handle->visObj[i]).v[1]),
-                                          float(std::get<4>(handle->visObj[i]).v[2])});
-        processGraphicalObject(handle.visual().back(), std::get<2>(handle->visObj[i]));
-    }
-    asHandles_.push_back(handle);
-    return handle;
+void PyXSim::integrate() {
+    world_->integrate();
 }

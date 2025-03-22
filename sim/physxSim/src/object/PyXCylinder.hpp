@@ -1,5 +1,3 @@
-/**  PyXCylinder */
-
 #ifndef SIMBENCHMARK_PYXCYLINDER_HPP
 #define SIMBENCHMARK_PYXCYLINDER_HPP
 
@@ -8,7 +6,6 @@
 namespace physx_sim {
 namespace object {
 
-    /** 圆柱体类型 */
     class PyXCylinder:public PyXSingleBodyObject {
     public:
         PyXCylinder(double radius,

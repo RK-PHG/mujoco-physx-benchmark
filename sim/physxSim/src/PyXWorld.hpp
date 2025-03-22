@@ -169,20 +169,15 @@ namespace physx_sim {
         CollisionCallback(physx_sim::PyXWorld* world):world_(world){}
         void onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs) override {
             world_->contactProblemList_.clear();
-
             for (PxU32 i = 0; i < nbPairs; ++i) {
-
                 const PxContactPair& contactPair = pairs[i];
                 PxContactPairPoint contactPoints[16];
                 PxU32 extractedPoints = contactPair.extractContacts(contactPoints, 16);
-
                 for (PxU32 j = 0; j < extractedPoints; ++j) {
                     const PxVec3& position = contactPoints[j].position;
-
                     Single3DContactProblem contact(position.x, position.y, position.z);
                     contact.normal_ = Eigen::Vector3d(contactPoints[j].normal.x, contactPoints[j].normal.y, contactPoints[j].normal.z);
                     contact.force_ = contactPoints[j].separation;
-
                     world_->contactProblemList_.push_back(contact);
                 }
             }

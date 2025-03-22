@@ -8,8 +8,5 @@ set(CMAKE_CXX_FLAGS_RELEASE
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(mujocoAnymalMomentumBenchmark AnymalMomentumBenchmark.cpp)
-target_link_libraries(mujocoAnymalMomentumBenchmark mujocoSim benchmark)
-
 add_executable(mujoco666Benchmark 666Benchmark.cpp)
 target_link_libraries(mujoco666Benchmark mujocoSim benchmark)

@@ -1,8 +1,5 @@
-/** PyXCapsule */
-
 #include "PyXCapsule.hpp"
 
-/** 胶囊体 */
 physx_sim::object::PyXCapsule::PyXCapsule(double radius,
                                           double height,
                                           double mass,

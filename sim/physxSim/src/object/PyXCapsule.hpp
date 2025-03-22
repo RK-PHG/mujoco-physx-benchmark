@@ -1,5 +1,3 @@
-/** PyXCapsule */
-
 #ifndef SIMBENCHMARK_PYXCAPSULE_HPP
 #define SIMBENCHMARK_PYXCAPSULE_HPP
 
@@ -9,7 +7,6 @@
 namespace physx_sim{
 namespace object{
 
-    /** 胶囊体 */
     class PyXCapsule: public PyXSingleBodyObject{
 
     public:

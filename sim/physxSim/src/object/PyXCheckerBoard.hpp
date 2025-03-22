@@ -1,5 +1,3 @@
-/** PyxCheckerBoard */
-
 #ifndef SIMBENCHMARK_PYXCHECKERBOARD_HPP
 #define SIMBENCHMARK_PYXCHECKERBOARD_HPP
 
@@ -7,7 +5,7 @@
 
 namespace physx_sim {
 namespace object {
-    /** 地面类型 */
+
     class PyXCheckerBoard: public PyXSingleBodyObject {
 
     public:

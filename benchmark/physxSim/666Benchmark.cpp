@@ -1,5 +1,3 @@
-/** 此文件是 mujoco 666 测试的入口文件 */
-
 #include "PyXSim.hpp"
 #include "666Benchmark.hpp"
 
@@ -7,10 +5,7 @@ physx_sim::PyXSim *sim;
 std::vector<benchmark::SingleBodyHandle> objList;
 po::options_description desc;
 
-/**
- * 检查物体间的穿透情况
- * 返回计算的误差值
- */
+
 double penetrationCheck() {
 
     /** 记录穿透误差的数量 */
