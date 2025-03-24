@@ -6,6 +6,7 @@ physx_sim::object::PyXBox::PyXBox(double xLength,
                                   double mass,
                                   physx::PxRigidDynamic *actor,
                                   physx::PxMaterial* material)
-                                  : PyXSingleBodyObject(actor,material),xLength_(xLength),yLength_(yLength),zLength_(zLength){
+                                  : PyXSingleBodyObject(actor,material),xLength_(xLength),
+                                  yLength_(yLength),zLength_(zLength){
     this->mass_ = mass;
 }

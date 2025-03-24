@@ -3,7 +3,6 @@
 namespace physx_sim{
     namespace object{
 
-        /** 无参构造函数 */
         PyXSingleBodyObject::PyXSingleBodyObject() {}
 
         /** *

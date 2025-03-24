@@ -1,4 +1,3 @@
-/** 关节系统 */
 #include "PyXArticulatedSystem.hpp"
 #include "PyXWorld.hpp"
 
