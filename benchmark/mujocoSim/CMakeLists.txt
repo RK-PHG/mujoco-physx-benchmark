@@ -10,3 +10,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(mujoco666Benchmark 666Benchmark.cpp)
 target_link_libraries(mujoco666Benchmark mujocoSim benchmark)
+
+add_executable(mujocoRollingBenchmark RollingBenchmark.cpp)
+target_link_libraries(mujocoRollingBenchmark mujocoSim benchmark)

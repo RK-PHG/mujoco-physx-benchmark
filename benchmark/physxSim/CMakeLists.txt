@@ -9,3 +9,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # 落石场景
 add_executable(physx666Benchmark 666Benchmark.cpp)
 target_link_libraries(physx666Benchmark physxSim benchmark)
+
+
+add_executable(physxRollingBenchmark RollingBenchmark.cpp)
+target_link_libraries(physxRollingBenchmark physxSim benchmark)
