@@ -23,7 +23,8 @@ enum Simulator {
  * options for benchmark test
  */
 struct Option {
-  // gui on/off
+
+    // gui on/off
   bool gui = true;
 
   // save video

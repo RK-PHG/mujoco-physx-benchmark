@@ -97,7 +97,7 @@ namespace benchmark::rolling {
         int n = 5;     // num balls = n x n
         double M = 10;
         double g = -9.81;
-        double T = 4.0;
+        double T = 2.0;
         double F = 150;
 
         double initPenetration = 5e-6;

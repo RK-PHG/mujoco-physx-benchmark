@@ -1,11 +1,5 @@
-//
-// Created by kangd on 05.05.18.
-//
-
 #include "PyXSim.hpp"
-
 #include "RollingBenchmark.hpp"
-#include "PyXBenchmark.hpp"
 
 // sim
 physx_sim::PyXSim *sim;
@@ -19,13 +13,14 @@ po::options_description desc;
 void setupSimulation() {
 
     if (benchmark::rolling::options.gui)
-        sim = new physx_sim::PyXSim(800, 600, 0.5);    else
+        sim = new physx_sim::PyXSim(800, 600, 0.5);
+    else
         sim = new physx_sim::PyXSim();
 
     // timestep
     sim->setTimeStep(benchmark::rolling::options.dt);
 
-    /// no erp for dart
+
     if(benchmark::rolling::options.erpYN)
     RAIFATAL("erp is not supported for dart")
 }
@@ -35,9 +30,8 @@ void setupWorld() {
     // add objects
     auto checkerboard = sim->addCheckerboard(5.0, 100.0, 100.0, 0.1, bo::BOX_SHAPE, 1, -1, bo::GRID);
     checkerboard->setFrictionCoefficient(benchmark::rolling::params.dartGroundMu);
-    checkerboard->setRestitutionCoefficient(1.0);
 
-    auto box = sim->addBox(20, 20, 1, 0.5, 0, 0);
+    auto box = sim->addBox(20, 20, 1, 0.8, 0, 0);
     box->setPosition(0, 0, 2);
     box->setFrictionCoefficient(benchmark::rolling::params.dartBoxMu);
     objList.push_back(box);
@@ -79,9 +73,9 @@ double simulationLoop(bool timer = true, bool error = true) {
         force = {0,
                  benchmark::rolling::params.F,
                  0};
-    else if(benchmark::rolling::options.forceDirection == benchmark::rolling::FORCE_XY)
-        force = {benchmark::rolling::params.F * 0.5 * 80,
-                 benchmark::rolling::params.F * 0.866025403784439 * 80,
+    else if (benchmark::rolling::options.forceDirection == benchmark::rolling::FORCE_XY)
+        force = {benchmark::rolling::params.F * 0.5 * 100,
+                 benchmark::rolling::params.F * 0.866025403784439 * 100,
                  0};
 
     // resever error vector
@@ -108,6 +102,8 @@ double simulationLoop(bool timer = true, bool error = true) {
             benchmark::rolling::data.ballPos.push_back(objList[1]->getPosition());
         }
 
+
+
         // step
         sim->integrate();
     }
@@ -119,12 +115,6 @@ double simulationLoop(bool timer = true, bool error = true) {
 }
 
 int main(int argc, const char* argv[]) {
-
-//    benchmark::rolling::addDescToOption(desc);
-//    benchmark::physx::addDescToOption(desc);
-//
-//    benchmark::rolling::getOptionsFromArg(argc, argv, desc);
-//    benchmark::dart::getOptionsFromArg(argc, argv, desc);
 
     benchmark::rolling::getParamsFromYAML(benchmark::rolling::getYamlpath().c_str(),
                                           benchmark::DART);

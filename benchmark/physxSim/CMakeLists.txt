@@ -13,3 +13,11 @@ target_link_libraries(physx666Benchmark physxSim benchmark)
 
 add_executable(physxRollingBenchmark RollingBenchmark.cpp)
 target_link_libraries(physxRollingBenchmark physxSim benchmark)
+
+
+add_executable(physxBoxSlideBenchmark BoxSlideBenchmark.cpp)
+target_link_libraries(physxBoxSlideBenchmark physxSim benchmark)
+
+
+add_executable(physxSlopeSliderBenchmark SlopeSliderBenchmark.cpp)
+target_link_libraries(physxSlopeSliderBenchmark physxSim benchmark)

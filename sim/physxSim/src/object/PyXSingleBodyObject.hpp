@@ -111,7 +111,7 @@ namespace physx_sim {
 
         double mass_ = 0;
 
-        [[maybe_unused]] physx::PxRigidStatic* staticActor_;
+        physx::PxRigidStatic* staticActor_;
 
     };
 

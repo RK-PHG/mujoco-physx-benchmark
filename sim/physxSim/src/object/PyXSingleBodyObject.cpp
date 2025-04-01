@@ -170,7 +170,7 @@ namespace physx_sim{
         * @param friction 要设置的摩擦系数。
         */
          void PyXSingleBodyObject::setFrictionCoefficient(double friction) {
-             material_->setStaticFriction(friction);
+             material_->setDynamicFriction(friction);
          }
 
         /**

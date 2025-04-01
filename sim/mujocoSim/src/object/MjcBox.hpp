@@ -1,5 +1,3 @@
-/** 盒体 */
-
 #ifndef MUJOCOSIM_BOX_HPP
 #define MUJOCOSIM_BOX_HPP
 
