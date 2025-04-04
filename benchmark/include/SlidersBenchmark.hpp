@@ -25,7 +25,7 @@ namespace benchmark::slopeSlider {
 
         double lightPosition[3] = {30.0, 0, 10.0};
 
-        double T = 8.0;
+        double T = 5.0;
 
         double erp = 0.2;
 

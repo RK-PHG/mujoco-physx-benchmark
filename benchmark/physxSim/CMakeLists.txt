@@ -19,5 +19,5 @@ add_executable(physxBoxSlideBenchmark BoxSlideBenchmark.cpp)
 target_link_libraries(physxBoxSlideBenchmark physxSim benchmark)
 
 
-add_executable(physxSlopeSliderBenchmark SlopeSliderBenchmark.cpp)
-target_link_libraries(physxSlopeSliderBenchmark physxSim benchmark)
+add_executable(physxSlidersBenchmark SlidersBenchmark.cpp)
+target_link_libraries(physxSlidersBenchmark physxSim benchmark)

@@ -6,6 +6,7 @@
 mujoco_sim::MjcSim *sim;
 po::options_description desc;
 
+std::vector<double> e_list;
 
 double penetrationCheck() {
     double error = 0;
@@ -117,6 +118,9 @@ double simulationLoop(bool timer = true, bool error = true) {
         if (benchmark::sixsixsix::options.gui && !sim->visualizerLoop(benchmark::sixsixsix::options.dt))
             break;
 
+        // get system energy
+        e_list.push_back(sim->getEnergy({0, 0, benchmark::sixsixsix::params.g}));
+
         // data save
         if (error) {
             if (benchmark::sixsixsix::options.elasticCollision) {
@@ -167,32 +171,27 @@ int main(int argc, const char* argv[]) {
     // trial1: get Error
     setupSimulation();
     setupWorld();
-    simulationLoop(false, true);
-    double error = benchmark::sixsixsix::data.computeError();
+    simulationLoop(false, false);
 
-    // reset
-    resetWorld();
+    std::ofstream outFile("mujoco_666_test_result.csv");
+    if (!outFile.is_open()) {
+        std::cerr << "无法创建文件: " << "mujoco_666_test_result.csv" << std::endl;
+    }
 
-    // trial2: get CPU time
-    setupWorld();
-    double time = simulationLoop(true, false);
+    // 写入 CSV 标题
+    outFile << "energy\n";
 
-    if(benchmark::sixsixsix::options.csv)
-        benchmark::sixsixsix::printCSV(benchmark::sixsixsix::getCSVpath(),
-                                       benchmark::mujoco::options.simName,
-                                       benchmark::mujoco::options.solverName,
-                                       benchmark::mujoco::options.detectorName,
-                                       benchmark::mujoco::options.integratorName,
-                                       time,
-                                       error);
+    // 设置精度（保留6位小数）
+    outFile << std::fixed << std::setprecision(6);
 
-    RAIINFO(
-            std::endl << "CPU time   : " << time << std::endl
-                      << "mean error : " << error << std::endl
-                      << "=======================" << std::endl
-    )
+    // 逐行写入数据
+    for (size_t i = 0; i < e_list.size(); ++i) {
+        outFile << e_list[i] << "\n";
+    }
 
-    delete sim;
+    outFile.close();
+    std::cout << "数据已保存到: " << "mujoco_666_test_result.csv" << std::endl;
+    
     return 0;
 
 }
