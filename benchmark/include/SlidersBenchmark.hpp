@@ -43,6 +43,15 @@ namespace benchmark::slopeSlider {
 
     } params;
 
+    std::string getMujocoXMLpath() {
+
+        std::string xmlPath(RESOURCEPATH);
+        xmlPath += "/benchmark/sliders-benchmark/mujoco/sliders.xml";
+
+        return xmlPath;
+    }
+
+
 
 } // benchmark::rolling
 

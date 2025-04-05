@@ -205,7 +205,7 @@ namespace benchmark::rolling {
     std::string getMujocoXMLpath() {
 
         std::string xmlPath(RESOURCEPATH);
-        xmlPath += "/benchmark/rolling-benchmark/mujoco/rolling.xml";
+        xmlPath += "/benchmark/rolling-benchmark/mujoco/sliders.xml";
 
         return xmlPath;
     }

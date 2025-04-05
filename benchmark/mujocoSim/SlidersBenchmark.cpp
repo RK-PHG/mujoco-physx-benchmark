@@ -1,10 +1,9 @@
-#include "PyXSim.hpp"
+#include <MjcSim.hpp>
+
+#include "MjcBenchmark.hpp"
 #include "SlidersBenchmark.hpp"
-#include <fstream>
 
-physx_sim::PyXSim *sim;
-
-std::vector<benchmark::SingleBodyHandle> objList;  //按照添加顺序 0-大滑块 1-小滑块
+mujoco_sim::MjcSim *sim;
 
 // 用于保存仿真过程中滑块速度
 std::vector<double> v1_list;    // 下面
@@ -16,46 +15,59 @@ std::vector<double> s2_list;    // 上面
 
 
 void setupSimulation() {
-
-    // 初始化仿真器
     if (benchmark::slopeSlider::options.gui)
-        sim = new physx_sim::PyXSim(800, 600, 0.5);
+        sim = new mujoco_sim::MjcSim(800, 600, 0.5,
+                                     benchmark::slopeSlider::getMujocoXMLpath().c_str(),
+                                     benchmark::mujoco::getKeypath().c_str(),
+                                     benchmark::NO_BACKGROUND,
+                                     benchmark::mujoco::options.solverOption,
+                                     benchmark::mujoco::options.integratorOption);
     else
-        sim = new physx_sim::PyXSim();  // 无GUI版本
+        sim = new mujoco_sim::MjcSim(benchmark::slopeSlider::getMujocoXMLpath().c_str(),
+                                     benchmark::mujoco::getKeypath().c_str(),
+                                     benchmark::mujoco::options.solverOption,
+                                     benchmark::mujoco::options.integratorOption);
 
     sim->setTimeStep(benchmark::slopeSlider::options.dt);
 }
 
+
 void setupWorld() {
 
-    // 地面
-    auto checkerboard = sim->addCheckerboard(5.0, 100.0, 100.0, 0.1, bo::BOX_SHAPE, 1, -1, bo::GRID);
-    checkerboard->setFrictionCoefficient(benchmark::slopeSlider::params.groundMu);
-
-    // 下面的滑块
-    auto box = sim->addBox(10, 40, 2, 0.8, 0, 0);
-    box->setPosition(0, 0, 2);
-    box->setVelocity(0,benchmark::slopeSlider::params.v,0,0,0,0);
-    box->setFrictionCoefficient(benchmark::slopeSlider::params.boxMu);
-    objList.push_back(box);
-
-    // 上面的滑块
-    auto box2 = sim->addBox(10, 5, 2, 0.8, 0, 0);
-    box2->setPosition(0, 10, 6);
-    box2->setFrictionCoefficient(benchmark::slopeSlider::params.boxMu);
-    objList.push_back(box2);
-
-    // 设置重力
+    // 重力加速度
     sim->setGravity({0, 0, benchmark::slopeSlider::params.g});
 
-    // 场景摄像机
+    /// Note. for mujoco (frictional coefficient A-B) = max(coeff of A, coeff of B)
+    sim->getSingleBodyHandle(0)->setFrictionCoefficient(benchmark::slopeSlider::params.groundMu);
+    sim->getSingleBodyHandle(1)->setFrictionCoefficient(benchmark::slopeSlider::params.boxMu);
+    sim->getSingleBodyHandle(2)->setFrictionCoefficient(benchmark::slopeSlider::params.boxMu);
+
+    Eigen::VectorXd genCoord(14);
+    genCoord << 0, 0, 1.0,
+            0, 0, 0,
+            0, 0, 0,
+            3.0, 0, 0,
+            0, 0;
+
+
+    Eigen::VectorXd genVelocity(12);
+    genVelocity << 0, 10, 0,
+            0, 0, 0,
+            0, 0, 0,
+            0, 0, 0;
+
+    sim->setGeneralizedCoordinate(genCoord);
+    sim->setGeneralizedVelocity(genVelocity);
+
+    // 设置相机跟随
     if(benchmark::slopeSlider::options.gui) {
         sim->setLightPosition((float)benchmark::slopeSlider::params.lightPosition[0],
                               (float)benchmark::slopeSlider::params.lightPosition[1],
                               (float)benchmark::slopeSlider::params.lightPosition[2]);
-        sim->cameraFollowObject(checkerboard, {30, 0, 15});
+        sim->cameraFollowObject(sim->getSingleBodyHandle(1), {30, 0, 15});
     }
 }
+
 
 double simulationLoop(bool timer = true, bool error = true) {
 
@@ -65,26 +77,27 @@ double simulationLoop(bool timer = true, bool error = true) {
         watch.start();
 
     for(int i = 0; i < (int) (benchmark::slopeSlider::params.T / benchmark::slopeSlider::options.dt); i++) {
-
-        // 更新gui选项
+        // gui
         if(benchmark::slopeSlider::options.gui && !sim->visualizerLoop(benchmark::slopeSlider::options.dt))
             break;
 
+        std::cout << sim->getStateDimension() << std::endl;
+
         // s
-        double s1 = objList[0]->getPosition()[1];
-        double s2 = objList[1]->getPosition()[1];
+        double s1 = sim->getSingleBodyHandle(1)->getPosition()[1];
+        double s2 = sim->getSingleBodyHandle(2)->getPosition()[1];
 
         s1_list.push_back(s1);
         s2_list.push_back(s2);
 
         // velocity
-        double v1 = objList[0]->getLinearVelocity()[1];  //上面滑块速度
-        double v2 = objList[1]->getLinearVelocity()[1];  //下面滑块速度
+        double v1 = sim->getSingleBodyHandle(1)->getLinearVelocity()[1];  //上面滑块速度
+        double v2 = sim->getSingleBodyHandle(2)->getLinearVelocity()[1];  //下面滑块速度
 
         v1_list.push_back(v1);
         v2_list.push_back(v2);
 
-        // step
+        // integrate step2
         sim->integrate();
     }
 
@@ -96,10 +109,12 @@ double simulationLoop(bool timer = true, bool error = true) {
 
 int main() {
 
-    // 初始化仿真场景
+    // trial1: get Error
     setupSimulation();
+
     setupWorld();
-    simulationLoop(false, true);
+
+    simulationLoop(false, false);
 
     // 相关参数计算
     double boxMu = benchmark::slopeSlider::params.boxMu;
@@ -149,5 +164,7 @@ int main() {
     )
 
     delete sim;
+
     return 0;
+
 }
