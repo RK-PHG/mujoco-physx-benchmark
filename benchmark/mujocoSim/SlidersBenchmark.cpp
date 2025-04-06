@@ -164,7 +164,6 @@ int main() {
     )
 
     delete sim;
-
     return 0;
 
 }

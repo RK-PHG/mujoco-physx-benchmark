@@ -20,7 +20,6 @@ void setupSimulation() {
                                      benchmark::mujoco::options.solverOption,
                                      benchmark::mujoco::options.integratorOption);
 
-    // timestep
     sim->setTimeStep(benchmark::rolling::options.dt);
 
     // solver iteration
@@ -34,6 +33,7 @@ void setupSimulation() {
 }
 
 void setupWorld() {
+
     // gravity
     sim->setGravity({0, 0, benchmark::rolling::params.g});
 

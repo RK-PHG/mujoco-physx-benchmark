@@ -194,6 +194,7 @@ namespace benchmark::rolling {
         // num data
         int n = 0;
     };
+
     Data data;
 
 /**
@@ -205,7 +206,7 @@ namespace benchmark::rolling {
     std::string getMujocoXMLpath() {
 
         std::string xmlPath(RESOURCEPATH);
-        xmlPath += "/benchmark/rolling-benchmark/mujoco/sliders.xml";
+        xmlPath += "/benchmark/rolling-benchmark/mujoco/rolling.xml";
 
         return xmlPath;
     }

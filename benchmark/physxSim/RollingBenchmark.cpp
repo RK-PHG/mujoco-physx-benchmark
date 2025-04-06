@@ -1,44 +1,38 @@
 #include "PyXSim.hpp"
 #include "RollingBenchmark.hpp"
 
-// sim
 physx_sim::PyXSim *sim;
 
-// objects
+// 单体列表
 std::vector<benchmark::SingleBodyHandle> objList;
 
-// options description
-po::options_description desc;
 
+// 初始化仿真环境
 void setupSimulation() {
 
+    // 支持GUI的仿真选项
     if (benchmark::rolling::options.gui)
         sim = new physx_sim::PyXSim(800, 600, 0.5);
     else
         sim = new physx_sim::PyXSim();
 
-    // timestep
+    // 设置时间步长
     sim->setTimeStep(benchmark::rolling::options.dt);
-
-
-    if(benchmark::rolling::options.erpYN)
-    RAIFATAL("erp is not supported for dart")
 }
 
 void setupWorld() {
 
-    // add objects
+    // 地面
     auto checkerboard = sim->addCheckerboard(5.0, 100.0, 100.0, 0.1, bo::BOX_SHAPE, 1, -1, bo::GRID);
     checkerboard->setFrictionCoefficient(benchmark::rolling::params.dartGroundMu);
 
+    // 下面的平板滑动
     auto box = sim->addBox(20, 20, 1, 0.8, 0, 0);
     box->setPosition(0, 0, 2);
     box->setFrictionCoefficient(benchmark::rolling::params.dartBoxMu);
     objList.push_back(box);
 
-    if(benchmark::rolling::options.gui)
-        box.visual()[0]->setColor({0,1.0,0});
-
+    // 逐个添加平板上的小球
     for(int i = 0; i < benchmark::rolling::params.n; i++) {
         for(int j = 0; j < benchmark::rolling::params.n; j++) {
             auto ball = sim->addSphere(0.5, 1, 0, 0);
@@ -48,15 +42,13 @@ void setupWorld() {
             ball->setFrictionCoefficient(benchmark::rolling::params.dartBallMu);
             ball->setRestitutionCoefficient(1.0);
             objList.push_back(ball);
-
-            if(benchmark::rolling::options.gui)
-                box.visual()[0]->setColor({0,1.0,0});
         }
     }
 
-    // gravity
+    // 重力加速度
     sim->setGravity({0, 0, benchmark::rolling::params.g});
 
+    // 相机设置
     if(benchmark::rolling::options.gui) {
         sim->setLightPosition((float)benchmark::rolling::params.lightPosition[0],
                               (float)benchmark::rolling::params.lightPosition[1],
@@ -65,44 +57,42 @@ void setupWorld() {
     }
 }
 
+// 仿真循环
 double simulationLoop(bool timer = true, bool error = true) {
 
-    // force
+    // 在每个循环中对小球施加力
     Eigen::Vector3d force;
     if(benchmark::rolling::options.forceDirection == benchmark::rolling::FORCE_Y)
-        force = {0,
-                 benchmark::rolling::params.F,
-                 0};
+        force = {0, benchmark::rolling::params.F, 0};
     else if (benchmark::rolling::options.forceDirection == benchmark::rolling::FORCE_XY)
-        force = {benchmark::rolling::params.F * 0.5 * 100,
-                 benchmark::rolling::params.F * 0.866025403784439 * 100,
+        force = {benchmark::rolling::params.F * 0.5 * 1000,
+                 benchmark::rolling::params.F * 0.866025403784439 * 1000,
                  0};
 
-    // resever error vector
+    // 预留错误向量
     benchmark::rolling::data.setN(unsigned(benchmark::rolling::params.T / benchmark::rolling::options.dt));
 
-    // timer start
+    // 计时开始
     StopWatch watch;
     if(timer)
         watch.start();
 
     for(int i = 0; i < (int) (benchmark::rolling::params.T / benchmark::rolling::options.dt); i++) {
+
         // gui
         if(benchmark::rolling::options.gui && !sim->visualizerLoop(benchmark::rolling::options.dt))
             break;
 
-        // set force to box
+        // 对box施加力
         objList[0]->setExternalForce(force);
 
-        // data save
+        // 计算误差
         if(error) {
             benchmark::rolling::data.boxVel.push_back(objList[0]->getLinearVelocity());
             benchmark::rolling::data.boxPos.push_back(objList[0]->getPosition());
             benchmark::rolling::data.ballVel.push_back(objList[1]->getLinearVelocity());
             benchmark::rolling::data.ballPos.push_back(objList[1]->getPosition());
         }
-
-
 
         // step
         sim->integrate();
@@ -114,37 +104,12 @@ double simulationLoop(bool timer = true, bool error = true) {
     return time;
 }
 
-int main(int argc, const char* argv[]) {
+int main() {
 
-    benchmark::rolling::getParamsFromYAML(benchmark::rolling::getYamlpath().c_str(),
-                                          benchmark::DART);
-
-    RAIINFO(
-            std::endl << "=======================" << std::endl
-                      << "Simulator: DART" << std::endl
-                      << "GUI      : " << benchmark::rolling::options.gui << std::endl
-                      << "ERP      : " << benchmark::rolling::options.erpYN << std::endl
-                      << "Force    : " << benchmark::rolling::options.forceDirection << std::endl
-                      << "Timestep : " << benchmark::rolling::options.dt << std::endl
-                      << "Solver   : "
-                      << "Num iter : " << benchmark::rolling::options.numSolverIter << std::endl
-                      << "-----------------------"
-    )
-
-    // trial1: get Error
     setupSimulation();
     setupWorld();
-    double time = simulationLoop(false, true);
+    double time = simulationLoop(true, true);
     double error = benchmark::rolling::data.computeError();
-
-    if(benchmark::rolling::options.csv)
-        benchmark::rolling::printCSV(benchmark::rolling::getCSVpath(),
-                                     "simName",
-                                     "solverName",
-                                     "detectorName",
-                                     "integratorName",
-                                     time,
-                                     error);
 
     RAIINFO(
             std::endl << "CPU time   : " << time << std::endl

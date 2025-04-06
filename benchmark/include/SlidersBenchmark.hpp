@@ -12,12 +12,9 @@ namespace ru = rai::Utils;
 
 namespace benchmark::slopeSlider {
 
-    std::string getYamlPath();
-
     struct Option: benchmark::Option {
 
         double dt = 0.01;
-
 
     } options;
 
@@ -35,8 +32,6 @@ namespace benchmark::slopeSlider {
 
         double v = 10.0; // m,s
 
-        double f = 0.2;
-
         double groundMu = 0.2;
 
         double boxMu = 0.2;
@@ -46,9 +41,11 @@ namespace benchmark::slopeSlider {
     std::string getMujocoXMLpath() {
 
         std::string xmlPath(RESOURCEPATH);
+
         xmlPath += "/benchmark/sliders-benchmark/mujoco/sliders.xml";
 
         return xmlPath;
+
     }
 
 
