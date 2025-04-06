@@ -64,11 +64,23 @@ public:
 
     physx_sim::PyXWorld* world_;
 
+    benchmark::SingleBodyHandle addSphere(double radius, double mass);
+
+    benchmark::SingleBodyHandle addBox(double xLength, double yLength, double zLength, double mass);
+
+    benchmark::SingleBodyHandle addCylinder(double radius, double height, double mass);
+
+    benchmark::SingleBodyHandle addCheckerboard(double gridSize, double xLength, double yLength);
+
+    benchmark::SingleBodyHandle addCapsule(double radius, double height, double mass);
+
+    // 不直接调用
     benchmark::SingleBodyHandle addSphere(double radius,
                                           double mass,
                                           int bodyId,
                                           int geomId) override ;
 
+    // 不直接调用
     benchmark::SingleBodyHandle addBox(double xLength,
                                        double yLength,
                                        double zLength,
@@ -76,6 +88,7 @@ public:
                                        int bodyId,
                                        int geomId) override ;
 
+    // 不直接调用
     benchmark::SingleBodyHandle addCylinder(double radius,
                                             double height,
                                             double mass,
@@ -83,6 +96,7 @@ public:
                                             int geomId) override {
     }
 
+    // 不直接调用
     benchmark::SingleBodyHandle addCheckerboard(double gridSize,
                                                 double xLength,
                                                 double yLength,
@@ -92,6 +106,7 @@ public:
                                                 int geomId,
                                                 int flags = 0) override ;
 
+    // 不直接调用
     benchmark::SingleBodyHandle addCapsule(double radius,
                                            double height,
                                            double mass,

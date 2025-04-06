@@ -4,6 +4,8 @@
 
 using namespace physx_sim;
 
+#define PI 3.141593
+
 PyXSim::PyXSim(int windowWidth,
                int windowHeight,
                float cms,
@@ -16,18 +18,30 @@ PyXSim::PyXSim() {
     world_ = new PyXWorld();
 }
 
-PyXSim::PyXSim(const std::string &modelPath) {
-    world_ = new PyXWorld();
-    world_->loadModel(modelPath);
-}
-
 PyXSim::~PyXSim() {
     delete world_;
 }
 
-/**
- * 添加球
- */
+benchmark::SingleBodyHandle PyXSim::addSphere(double radius, double mass){
+    return addSphere(radius, mass, 0, 0);
+}
+
+benchmark::SingleBodyHandle PyXSim::addBox(double xLength, double yLength, double zLength, double mass){
+    return addBox(xLength, yLength, zLength, mass, 0, 0);
+}
+
+benchmark::SingleBodyHandle PyXSim::addCylinder(double radius, double height, double mass){
+    return addCapsule(radius, height, mass, 0, 0);
+}
+
+benchmark::SingleBodyHandle PyXSim::addCheckerboard(double gridSize, double xLength, double yLength){
+    return addCheckerboard(gridSize, xLength, yLength, 0.1, bo::BOX_SHAPE, 1, -1, bo::GRID);
+}
+
+benchmark::SingleBodyHandle PyXSim::addCapsule(double radius, double height, double mass){
+    return addCapsule(radius, height, mass, 0, 0);
+}
+
 benchmark::SingleBodyHandle PyXSim::addSphere(double radius,
                                               double mass,
                                               int bodyId,
@@ -51,15 +65,13 @@ benchmark::SingleBodyHandle PyXSim::addSphere(double radius,
     return handle;
 }
 
-/**
- * 添加盒体
- */
 benchmark::SingleBodyHandle PyXSim::addBox(double xLength,
                                            double yLength,
                                            double zLength,
                                            double mass,
                                            int bodyId,
                                            int geomId) {
+
     object::PyXBox *box = world_->addBox(xLength, yLength, zLength, mass, {0.0f, 0.0f, 0.0f});
     benchmark::SingleBodyHandle handle(box, {}, {});
 
@@ -80,9 +92,6 @@ benchmark::SingleBodyHandle PyXSim::addBox(double xLength,
     return handle;
 }
 
-/**
- * 添加地面
- */
 benchmark::SingleBodyHandle PyXSim::addCheckerboard(double gridSize,
                                                     double xLength,
                                                     double yLength,
@@ -103,9 +112,6 @@ benchmark::SingleBodyHandle PyXSim::addCheckerboard(double gridSize,
     return handle;
 }
 
-/**
- * 添加胶囊体
- */
 benchmark::SingleBodyHandle PyXSim::addCapsule(double radius,
                                                double height,
                                                double mass,
@@ -132,9 +138,6 @@ benchmark::SingleBodyHandle PyXSim::addCapsule(double radius,
 
 }
 
-/**
- * 添加关节系统
- */
 ArticulatedSystemHandle  PyXSim::addArticulatedSystem(physx_sim::object::PyXArticulatedSystem* articulatedSystem){
 
     ArticulatedSystemHandle handle(
@@ -173,9 +176,7 @@ ArticulatedSystemHandle  PyXSim::addArticulatedSystem(physx_sim::object::PyXArti
     return handle;
 }
 
-/**
- * 更新显示帧，包括更新单体物体和机器人
- */
+
 void PyXSim::updateFrame() {
 
     RAIFATAL_IF(!gui_, "use different constructor for visualization")

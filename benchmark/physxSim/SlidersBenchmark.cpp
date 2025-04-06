@@ -15,6 +15,7 @@ std::vector<double> s1_list;    // 下面
 std::vector<double> s2_list;    // 上面
 
 
+// 初始化仿真器
 void setupSimulation() {
 
     // 初始化仿真器
@@ -33,15 +34,15 @@ void setupWorld() {
     checkerboard->setFrictionCoefficient(benchmark::slopeSlider::params.groundMu);
 
     // 下面的滑块
-    auto box = sim->addBox(10, 40, 2, 0.8, 0, 0);
-    box->setPosition(0, 0, 2);
+    auto box = sim->addBox(10, 40, 2, 8, 0, 0);
+    box->setPosition(0, 0, 1);
     box->setVelocity(0,benchmark::slopeSlider::params.v,0,0,0,0);
     box->setFrictionCoefficient(benchmark::slopeSlider::params.boxMu);
     objList.push_back(box);
 
     // 上面的滑块
-    auto box2 = sim->addBox(10, 5, 2, 0.8, 0, 0);
-    box2->setPosition(0, 10, 6);
+    auto box2 = sim->addBox(10, 5, 2, 1, 0, 0);
+    box2->setPosition(0, 10, 3);
     box2->setFrictionCoefficient(benchmark::slopeSlider::params.boxMu);
     objList.push_back(box2);
 
@@ -148,6 +149,5 @@ int main() {
                       << "=======================" << std::endl
     )
 
-    delete sim;
     return 0;
 }

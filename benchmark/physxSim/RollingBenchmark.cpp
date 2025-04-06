@@ -12,33 +12,34 @@ void setupSimulation() {
 
     // 支持GUI的仿真选项
     if (benchmark::rolling::options.gui)
-        sim = new physx_sim::PyXSim(800, 600, 0.5);
+        sim = new physx_sim::PyXSim(800, 600, 0.5); // 这三个参数都是窗口相关的，不用管
     else
-        sim = new physx_sim::PyXSim();
+        sim = new physx_sim::PyXSim(); // 无窗口世界接口
 
     // 设置时间步长
     sim->setTimeStep(benchmark::rolling::options.dt);
 }
 
+// 初始化场景
 void setupWorld() {
 
     // 地面
-    auto checkerboard = sim->addCheckerboard(5.0, 100.0, 100.0, 0.1, bo::BOX_SHAPE, 1, -1, bo::GRID);
+    auto checkerboard = sim->addCheckerboard(5.0, 100.0, 100.0);
     checkerboard->setFrictionCoefficient(benchmark::rolling::params.dartGroundMu);
 
     // 下面的平板滑动
-    auto box = sim->addBox(20, 20, 1, 0.8, 0, 0);
-    box->setPosition(0, 0, 2);
+    auto box = sim->addBox(20, 20, 1, 10);
+    box->setPosition(0, 0, 0.5);
     box->setFrictionCoefficient(benchmark::rolling::params.dartBoxMu);
     objList.push_back(box);
 
     // 逐个添加平板上的小球
     for(int i = 0; i < benchmark::rolling::params.n; i++) {
         for(int j = 0; j < benchmark::rolling::params.n; j++) {
-            auto ball = sim->addSphere(0.5, 1, 0, 0);
+            auto ball = sim->addSphere(0.5, 1);
             ball->setPosition(i * 2.0 - 4.0,
                               j * 2.0 - 4.0,
-                              2.5);
+                              1.5);
             ball->setFrictionCoefficient(benchmark::rolling::params.dartBallMu);
             ball->setRestitutionCoefficient(1.0);
             objList.push_back(ball);
@@ -65,8 +66,8 @@ double simulationLoop(bool timer = true, bool error = true) {
     if(benchmark::rolling::options.forceDirection == benchmark::rolling::FORCE_Y)
         force = {0, benchmark::rolling::params.F, 0};
     else if (benchmark::rolling::options.forceDirection == benchmark::rolling::FORCE_XY)
-        force = {benchmark::rolling::params.F * 0.5 * 1000,
-                 benchmark::rolling::params.F * 0.866025403784439 * 1000,
+        force = {benchmark::rolling::params.F * 0.5 * 4,
+                 benchmark::rolling::params.F * 0.866025403784439 * 4,
                  0};
 
     // 预留错误向量
@@ -83,7 +84,7 @@ double simulationLoop(bool timer = true, bool error = true) {
         if(benchmark::rolling::options.gui && !sim->visualizerLoop(benchmark::rolling::options.dt))
             break;
 
-        // 对box施加力
+        // 对下面的盒体施加力
         objList[0]->setExternalForce(force);
 
         // 计算误差
@@ -118,6 +119,5 @@ int main() {
                       << "=======================" << std::endl
     )
 
-    delete sim;
     return 0;
 }

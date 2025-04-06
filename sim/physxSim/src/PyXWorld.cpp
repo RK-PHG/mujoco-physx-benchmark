@@ -6,6 +6,8 @@
 using namespace physx_sim;
 using namespace std;
 
+#define PI 3.141593
+
 PxQuat eulerToQuaternion(float roll, float pitch, float yaw) {
 
     float cy = cos(yaw * 0.5f);
@@ -327,7 +329,7 @@ object::PyXSphere *PyXWorld::addSphere(double radius, double mass, benchmark::Ve
     PxShape *shape = PxRigidActorExt::createExclusiveShape(*rigidDynamic, PxSphereGeometry(radius), *material);
 
     rigidDynamic->attachShape(*shape);
-    PxRigidBodyExt::updateMassAndInertia(*rigidDynamic, mass);
+    PxRigidBodyExt::updateMassAndInertia(*rigidDynamic, mass/(4/3 * PI * radius * radius * radius));
     object::PyXSphere *sphere = new object::PyXSphere(radius, mass, rigidDynamic, material);
 
     scene_->addActor(*rigidDynamic);
@@ -344,11 +346,11 @@ object::PyXBox *PyXWorld::addBox(double xLength,
 
     PxRigidDynamic *rigidDynamic = physics_->createRigidDynamic(PxTransform(PxVec3(pos[0], pos[1], pos[2])));
     PxMaterial *material = physics_->createMaterial(0.0f, 0.0f, 0.0f);;
-    auto shape = PxRigidActorExt::createExclusiveShape(*rigidDynamic, PxBoxGeometry(xLength, yLength, zLength),
+    auto shape = PxRigidActorExt::createExclusiveShape(*rigidDynamic, PxBoxGeometry(xLength/2.0, yLength/2.0, zLength/2.0),
                                                        *material);
 
     rigidDynamic->attachShape(*shape);
-    PxRigidBodyExt::updateMassAndInertia(*rigidDynamic, mass);
+    PxRigidBodyExt::updateMassAndInertia(*rigidDynamic, mass / (xLength * yLength * zLength));
     object::PyXBox *pyXBox = new object::PyXBox(xLength, yLength, zLength, mass, rigidDynamic, material);
 
     scene_->addActor(*rigidDynamic);
