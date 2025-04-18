@@ -1,4 +1,5 @@
 #include "MjcSingleBodyObject.hpp"
+#include <algorithm> // for std::clamp
 
 namespace mujoco_sim {
 namespace object {
@@ -388,9 +389,11 @@ void MjcSingleBodyObject::setVelocity(Eigen::Vector3d linearVelocity, Eigen::Vec
 void MjcSingleBodyObject::setVelocity(double dx, double dy, double dz, double wx, double wy, double wz) {
 
 }
-void MjcSingleBodyObject::setRestitutionCoefficient(double restitution) {
 
+void MjcSingleBodyObject::setRestitutionCoefficient(double restitution)
+{
 }
+
 double MjcSingleBodyObject::getMass() {
   return getBodyMass();
 }

@@ -4,6 +4,8 @@
 physx_sim::PyXSim *sim;
 std::vector<benchmark::SingleBodyHandle> objList;
 
+std::vector<double> error_list; // original data for plot
+
 // 穿透误差检测
 double penetrationCheck() {
 
@@ -44,7 +46,7 @@ void setupSimulation(){
                                 benchmark::NO_BACKGROUND);
 
     // 设置时间步长
-    sim->setTimeStep(0.1);
+    sim->setTimeStep(benchmark::sixsixsix::options.dt);
 
 }
 
@@ -60,7 +62,7 @@ void setupWorld() {
     rand.seed(benchmark::sixsixsix::params.randomSeed);
 
     // 地面
-    auto checkerboard = sim->addCheckerboard(5.0, 200.0, 200.0, 0.1, bo::BOX_SHAPE, 1, -1, bo::GRID);
+    auto checkerboard = sim->addCheckerboard(5.0, 200.0, 200.0);
 
     // 设置地面摩擦力
     checkerboard->setFrictionCoefficient(0);
@@ -75,7 +77,7 @@ void setupWorld() {
 
                 // 添加球体
                 auto obj = sim->addSphere(benchmark::sixsixsix::params.ballR,
-                                          benchmark::sixsixsix::params.ballM,0,0);
+                                          benchmark::sixsixsix::params.ballM);
                 // 计算球体初始位置
                 double x =
                         double(i) * benchmark::sixsixsix::params.gap
@@ -138,6 +140,7 @@ double simulationLoop(bool timer = true, bool error = true) {
             else {
                 double error = penetrationCheck();
                 benchmark::sixsixsix::data.error.push_back(error);
+                error_list.push_back(error);
             }
         }
 
@@ -156,7 +159,28 @@ int main() {
 
     setupWorld();
 
-    simulationLoop(false, true);
+    double time = simulationLoop(true, true);
+
+    double error = benchmark::sixsixsix::data.computeError();
+
+    std::cout << "CPU time   : " << time << std::endl
+              << "mean error : " << error << std::endl
+              << "=======================" << std::endl;
+
+    std::ofstream outFile("physx_666_test_result.csv");
+    if (!outFile.is_open()) {
+        std::cerr << "无法创建文件: " << "physx_666_test_result.csv" << std::endl;
+    }
+
+    // 写入 CSV 标题
+    outFile << "error\n";
+
+    // 设置精度（保留6位小数）
+    outFile << std::fixed << std::setprecision(6);
+
+    for(size_t i = 0; i < error_list.size(); ++i){
+        outFile << error_list[i] << "\n";
+    }
 
     return 0;
 }

@@ -39,8 +39,12 @@ void setupWorld() {
 
     /// Note. for mujoco (frictional coefficient A-B) = max(coeff of A, coeff of B)
     sim->getSingleBodyHandle(0)->setFrictionCoefficient(benchmark::slopeSlider::params.groundMu);
+
     sim->getSingleBodyHandle(1)->setFrictionCoefficient(benchmark::slopeSlider::params.boxMu);
+    sim->getSingleBodyHandle(1)->setRestitutionCoefficient(0.0f);
+
     sim->getSingleBodyHandle(2)->setFrictionCoefficient(benchmark::slopeSlider::params.boxMu);
+    sim->getSingleBodyHandle(2)->setRestitutionCoefficient(0.0f);
 
     Eigen::VectorXd genCoord(14);
     genCoord << 0, 0, 1.0,

@@ -91,7 +91,12 @@ double simulationLoop(bool timer = true, bool error = true) {
     if(benchmark::rolling::options.saveVideo && benchmark::rolling::options.gui)
         sim->startRecordingVideo("/tmp", "mujoco-rolling-benchmark");
 
+    int a = 0;
+
     for(int i = 0; i < (int) (benchmark::rolling::params.T / benchmark::rolling::options.dt); i++) {
+
+        std::cout << a++ << std::endl;
+
         // gui
         if(benchmark::rolling::options.gui && !sim->visualizerLoop(benchmark::rolling::options.dt))
             break;
@@ -131,8 +136,8 @@ int main(int argc, const char* argv[]) {
     benchmark::rolling::getOptionsFromArg(argc, argv, desc);
     benchmark::mujoco::getOptionsFromArg(argc, argv, desc);
 
-    benchmark::rolling::getParamsFromYAML(benchmark::rolling::getYamlpath().c_str(),
-                                          benchmark::MUJOCO);
+//    benchmark::rolling::getParamsFromYAML(benchmark::rolling::getYamlpath().c_str(),
+//                                          benchmark::MUJOCO);
 
     RAIINFO(
             std::endl << "=======================" << std::endl
@@ -152,28 +157,29 @@ int main(int argc, const char* argv[]) {
     simulationLoop(false, true);
     double error = benchmark::rolling::data.computeError();
 
-    // reset
-    resetWorld();
 
-    // trial2: get CPU time
-    setupWorld();
-    double time = simulationLoop(true, false);
-
-    if(benchmark::rolling::options.csv)
-        benchmark::rolling::printCSV(benchmark::rolling::getCSVpath(),
-                                     benchmark::mujoco::options.simName,
-                                     benchmark::mujoco::options.solverName,
-                                     benchmark::mujoco::options.detectorName,
-                                     benchmark::mujoco::options.integratorName,
-                                     time,
-                                     error);
-
-    RAIINFO(
-            std::endl << "CPU time   : " << time << std::endl
-                      << "mean error : " << error << std::endl
-                      << "speed (Hz) : " << benchmark::rolling::params.T / benchmark::rolling::options.dt / time << std::endl
-                      << "=======================" << std::endl
-    )
+//    // reset
+//    resetWorld();
+//
+//    // trial2: get CPU time
+//    setupWorld();
+//    double time = simulationLoop(true, false);
+//
+//    if(benchmark::rolling::options.csv)
+//        benchmark::rolling::printCSV(benchmark::rolling::getCSVpath(),
+//                                     benchmark::mujoco::options.simName,
+//                                     benchmark::mujoco::options.solverName,
+//                                     benchmark::mujoco::options.detectorName,
+//                                     benchmark::mujoco::options.integratorName,
+//                                     time,
+//                                     error);
+//
+//    RAIINFO(
+//            std::endl << "CPU time   : " << time << std::endl
+//                      << "mean error : " << error << std::endl
+//                      << "speed (Hz) : " << benchmark::rolling::params.T / benchmark::rolling::options.dt / time << std::endl
+//                      << "=======================" << std::endl
+//    )
 
     delete sim;
     return 0;

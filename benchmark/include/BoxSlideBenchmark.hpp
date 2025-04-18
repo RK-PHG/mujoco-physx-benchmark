@@ -16,7 +16,7 @@ namespace benchmark::boxSlide {
 
     struct Option: benchmark::Option {
 
-        double dt = 0.01;
+        double dt = 0.005;
 
 
     } options;

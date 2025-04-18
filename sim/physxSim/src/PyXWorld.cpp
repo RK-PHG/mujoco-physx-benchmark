@@ -329,10 +329,15 @@ object::PyXSphere *PyXWorld::addSphere(double radius, double mass, benchmark::Ve
     PxShape *shape = PxRigidActorExt::createExclusiveShape(*rigidDynamic, PxSphereGeometry(radius), *material);
 
     rigidDynamic->attachShape(*shape);
-    PxRigidBodyExt::updateMassAndInertia(*rigidDynamic, mass/(4/3 * PI * radius * radius * radius));
+    double v_sphere = 8.0 / 3.0 * PI * radius * radius * radius;
+
+    PxRigidBodyExt::updateMassAndInertia(*rigidDynamic, mass/v_sphere);
+
     object::PyXSphere *sphere = new object::PyXSphere(radius, mass, rigidDynamic, material);
 
     scene_->addActor(*rigidDynamic);
+
+    std::cout << rigidDynamic->getMass() << std::endl;
     objectList_.push_back(sphere);
 
     return sphere;
@@ -350,10 +355,14 @@ object::PyXBox *PyXWorld::addBox(double xLength,
                                                        *material);
 
     rigidDynamic->attachShape(*shape);
-    PxRigidBodyExt::updateMassAndInertia(*rigidDynamic, mass / (xLength * yLength * zLength));
+    PxRigidBodyExt::updateMassAndInertia(*rigidDynamic, mass / 2 / (xLength * yLength * zLength));
     object::PyXBox *pyXBox = new object::PyXBox(xLength, yLength, zLength, mass, rigidDynamic, material);
 
+
     scene_->addActor(*rigidDynamic);
+
+    std::cout << rigidDynamic->getMass() << std::endl;
+
     objectList_.push_back(pyXBox);
 
     return pyXBox;
@@ -522,7 +531,9 @@ double PyXWorld::getPotentialEnergy(const benchmark::Vec<3> &gravity) {
 
     double pEnergy = 0;
 
+    int a = 1;
     for (auto &obj: objectList_) {
+        std::cout << "count: " << a++ << std::endl;
         if (obj->isMovable()) {
             pEnergy += obj->getPotentialEnergy(gravity);
         }

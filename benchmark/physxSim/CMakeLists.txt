@@ -21,3 +21,7 @@ target_link_libraries(physxBoxSlideBenchmark physxSim benchmark)
 
 add_executable(physxSlidersBenchmark SlidersBenchmark.cpp)
 target_link_libraries(physxSlidersBenchmark physxSim benchmark)
+
+
+add_executable(physxBouncingBenchmark BouncingBenchmark.cpp)
+target_link_libraries(physxBouncingBenchmark physxSim benchmark)

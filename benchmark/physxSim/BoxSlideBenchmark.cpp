@@ -27,6 +27,7 @@ void setupWorld() {
     auto checkerboard = sim->addCheckerboard(5.0, 100.0, 100.0, 0.1, bo::BOX_SHAPE, 1, -1, bo::GRID);
     checkerboard->setFrictionCoefficient(benchmark::boxSlide::params.groundMu);
 
+    //
     auto box = sim->addBox(5, 5, 3, 0.8, 0, 0);
     box->setPosition(0, 0, 3);
     box->setVelocity(0,benchmark::boxSlide::params.v,0,0,0,0);

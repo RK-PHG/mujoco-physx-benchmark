@@ -15,3 +15,6 @@ target_link_libraries(mujocoRollingBenchmark mujocoSim benchmark)
 
 add_executable(mujocoSlidersBenchmark SlidersBenchmark.cpp)
 target_link_libraries(mujocoSlidersBenchmark mujocoSim benchmark)
+
+add_executable(mujocoBouncingBenchmark BouncingBenchmark.cpp)
+target_link_libraries(mujocoBouncingBenchmark mujocoSim benchmark)

@@ -64,7 +64,7 @@ namespace benchmark::rolling {
         bool defaultParam = false;
 
         // time step
-        double dt = 0.001;
+        double dt = 0.005;
 
         /// Note
         /// 1. Bullet, RAI, Mujoco has both solver tolerance and iteration option
@@ -148,13 +148,44 @@ namespace benchmark::rolling {
          */
         double computeError() {
             Eigen::MatrixXd velErrorSq(n, 3);
+            std::vector<double> x_error_list;
+            std::vector<double> y_error_list;
+            std::vector<double> z_error_list;
+
             for(int i = 0; i < n; i++) {
+
                 Eigen::Vector3d ballVec = benchmark::rolling::computeAnalyticalSol(benchmark::rolling::options.dt * i, true);
                 Eigen::Vector3d boxVec = benchmark::rolling::computeAnalyticalSol(benchmark::rolling::options.dt * i, false);
 
-                velErrorSq.row(i).x() = pow((ballVel[i].x() - ballVec.x()), 2) + pow((boxVel[i].x() - boxVec.x()), 2);
-                velErrorSq.row(i).y() = pow((ballVel[i].y() - ballVec.y()), 2) + pow((boxVel[i].y() - boxVec.y()), 2);
-                velErrorSq.row(i).z() = pow((ballVel[i].z() - ballVec.z()), 2) + pow((boxVel[i].z() - boxVec.z()), 2);
+                double x_e = pow((ballVel[i].x() - ballVec.x()), 2) + pow((boxVel[i].x() - boxVec.x()), 2);
+                double y_e = pow((ballVel[i].y() - ballVec.y()), 2) + pow((boxVel[i].y() - boxVec.y()), 2);
+                double z_e = pow((ballVel[i].z() - ballVec.z()), 2) + pow((boxVel[i].z() - boxVec.z()), 2);
+
+                velErrorSq.row(i).x() = x_e;
+                velErrorSq.row(i).y() = y_e;
+                velErrorSq.row(i).z() = z_e;
+
+                x_error_list.push_back(x_e);
+                y_error_list.push_back(y_e);
+                z_error_list.push_back(z_e);
+            }
+
+            std::ofstream outFile("rolling_test_result.csv");
+            if (!outFile.is_open()) {
+                std::cerr << "无法创建文件: " << "rolling_test_result.csv" << std::endl;
+            }
+
+            // 写入 CSV 标题
+            outFile << "x_error, y_error, z_error\n";
+
+            // 设置精度（保留6位小数）
+            outFile << std::fixed << std::setprecision(6);
+
+            // 逐行写入数据
+            for (size_t i = 0; i < x_error_list.size(); ++i) {
+                outFile << x_error_list[i] << ","
+                        << y_error_list[i] << ","
+                        << z_error_list[i] << "\n";
             }
 
             if(options.plot) {
@@ -489,6 +520,7 @@ namespace benchmark::rolling {
     }
 
     Eigen::Vector3d computeAnalyticalSol(double t, bool isBall) {
+
         const double g = -benchmark::rolling::params.g;
         const double m = benchmark::rolling::params.m;
         const double M = benchmark::rolling::params.M;
@@ -500,10 +532,10 @@ namespace benchmark::rolling {
         const double simTime = benchmark::rolling::params.T;
         const double dt = benchmark::rolling::options.dt;
 
-        double f1 = mu1 * (M + n * m)  * g;
-        double f2 = 1 / M * (150 - f1) / (3.5 / m + 25 / M);
-        double a1 = (F - f1 - n * f2) / M;
-        double a2 = f2 / m;
+        double f1 = mu1 * (M + n * m)  * g; // 地面对平板的力
+        double f2 = 1 / M * (150 - f1) / (3.5 / m + 25 / M); //单个小球和平板之间的力
+        double a1 = (F - f1 - n * f2) / M;  // 平板加速度
+        double a2 = f2 / m; // 小球加速度
 
         double v = 0;
         if (isBall)
@@ -512,7 +544,6 @@ namespace benchmark::rolling {
             v = a1 * t;
 
         if (benchmark::rolling::options.forceDirection == benchmark::rolling::FORCE_XY)
-//    return {v * 0.707106781186547, v * 0.707106781186547, 0};
             return {v * 0.5, v * 0.866025403784439, 0};
         else
             return {0, v, 0};

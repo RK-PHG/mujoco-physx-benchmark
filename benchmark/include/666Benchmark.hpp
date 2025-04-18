@@ -25,7 +25,7 @@ namespace benchmark::sixsixsix {
 
         bool erpYN = false;
 
-        double dt = 0.01;
+        double dt = 0.005;
 
         double T = 10.0;
 

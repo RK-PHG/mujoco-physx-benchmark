@@ -229,8 +229,6 @@ namespace physx_sim{
              getPosition();
              benchmark::vecDot(posTemp_,gravity,potential);
 
-//            std::cout << "here2 " << potential << " " << mass  << " " << std::endl;
-
              return -potential * mass;
 
          }

@@ -6,6 +6,7 @@
 mujoco_sim::MjcSim *sim;
 po::options_description desc;
 
+std::vector<double> error_list;
 
 double penetrationCheck() {
     double error = 0;
@@ -125,6 +126,7 @@ double simulationLoop(bool timer = true, bool error = true) {
             else {
                 double error = penetrationCheck();
                 benchmark::sixsixsix::data.error.push_back(error);
+                error_list.push_back(error);
             }
         }
 
@@ -168,29 +170,44 @@ int main(int argc, const char* argv[]) {
     setupSimulation();
     setupWorld();
     simulationLoop(false, true);
-    double error = benchmark::sixsixsix::data.computeError();
+//    double error = benchmark::sixsixsix::data.computeError();
 
-    // reset
-    resetWorld();
+//    // reset
+//    resetWorld();
+//
+//    // trial2: get CPU time
+//    setupWorld();
+//    double time = simulationLoop(true, false);
+//
+//    if(benchmark::sixsixsix::options.csv)
+//        benchmark::sixsixsix::printCSV(benchmark::sixsixsix::getCSVpath(),
+//                                       benchmark::mujoco::options.simName,
+//                                       benchmark::mujoco::options.solverName,
+//                                       benchmark::mujoco::options.detectorName,
+//                                       benchmark::mujoco::options.integratorName,
+//                                       time,
+//                                       error);
 
-    // trial2: get CPU time
-    setupWorld();
-    double time = simulationLoop(true, false);
+//    RAIINFO(
+//            std::endl << "CPU time   : " << time << std::endl
+//                      << "mean error : " << error << std::endl
+//                      << "=======================" << std::endl
+//    )
 
-    if(benchmark::sixsixsix::options.csv)
-        benchmark::sixsixsix::printCSV(benchmark::sixsixsix::getCSVpath(),
-                                       benchmark::mujoco::options.simName,
-                                       benchmark::mujoco::options.solverName,
-                                       benchmark::mujoco::options.detectorName,
-                                       benchmark::mujoco::options.integratorName,
-                                       time,
-                                       error);
+    std::ofstream outFile("mujoco_666_test_result.csv");
+    if (!outFile.is_open()) {
+        std::cerr << "无法创建文件: " << "mujoco_666_test_result.csv" << std::endl;
+    }
 
-    RAIINFO(
-            std::endl << "CPU time   : " << time << std::endl
-                      << "mean error : " << error << std::endl
-                      << "=======================" << std::endl
-    )
+    // 写入 CSV 标题
+    outFile << "error\n";
+
+    // 设置精度（保留6位小数）
+    outFile << std::fixed << std::setprecision(6);
+
+    for(size_t i = 0; i < error_list.size(); ++i){
+        outFile << error_list[i] << "\n";
+    }
 
     delete sim;
     return 0;

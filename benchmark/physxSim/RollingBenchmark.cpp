@@ -25,12 +25,12 @@ void setupWorld() {
 
     // 地面
     auto checkerboard = sim->addCheckerboard(5.0, 100.0, 100.0);
-    checkerboard->setFrictionCoefficient(benchmark::rolling::params.dartGroundMu);
+    checkerboard->setFrictionCoefficient(benchmark::rolling::params.mjcGroundMu);
 
     // 下面的平板滑动
     auto box = sim->addBox(20, 20, 1, 10);
     box->setPosition(0, 0, 0.5);
-    box->setFrictionCoefficient(benchmark::rolling::params.dartBoxMu);
+    box->setFrictionCoefficient(benchmark::rolling::params.mjcBoxMu);
     objList.push_back(box);
 
     // 逐个添加平板上的小球
@@ -40,7 +40,7 @@ void setupWorld() {
             ball->setPosition(i * 2.0 - 4.0,
                               j * 2.0 - 4.0,
                               1.5);
-            ball->setFrictionCoefficient(benchmark::rolling::params.dartBallMu);
+            ball->setFrictionCoefficient(benchmark::rolling::params.mjcBallMu);
             ball->setRestitutionCoefficient(1.0);
             objList.push_back(ball);
         }
@@ -66,8 +66,8 @@ double simulationLoop(bool timer = true, bool error = true) {
     if(benchmark::rolling::options.forceDirection == benchmark::rolling::FORCE_Y)
         force = {0, benchmark::rolling::params.F, 0};
     else if (benchmark::rolling::options.forceDirection == benchmark::rolling::FORCE_XY)
-        force = {benchmark::rolling::params.F * 0.5 * 4,
-                 benchmark::rolling::params.F * 0.866025403784439 * 4,
+        force = {benchmark::rolling::params.F * 0.5,
+                 benchmark::rolling::params.F * 0.866025403784439,
                  0};
 
     // 预留错误向量
@@ -111,7 +111,6 @@ int main() {
     setupWorld();
     double time = simulationLoop(true, true);
     double error = benchmark::rolling::data.computeError();
-
     RAIINFO(
             std::endl << "CPU time   : " << time << std::endl
                       << "mean error : " << error << std::endl
