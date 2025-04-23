@@ -170,29 +170,6 @@ int main(int argc, const char* argv[]) {
     setupSimulation();
     setupWorld();
     simulationLoop(false, true);
-//    double error = benchmark::sixsixsix::data.computeError();
-
-//    // reset
-//    resetWorld();
-//
-//    // trial2: get CPU time
-//    setupWorld();
-//    double time = simulationLoop(true, false);
-//
-//    if(benchmark::sixsixsix::options.csv)
-//        benchmark::sixsixsix::printCSV(benchmark::sixsixsix::getCSVpath(),
-//                                       benchmark::mujoco::options.simName,
-//                                       benchmark::mujoco::options.solverName,
-//                                       benchmark::mujoco::options.detectorName,
-//                                       benchmark::mujoco::options.integratorName,
-//                                       time,
-//                                       error);
-
-//    RAIINFO(
-//            std::endl << "CPU time   : " << time << std::endl
-//                      << "mean error : " << error << std::endl
-//                      << "=======================" << std::endl
-//    )
 
     std::ofstream outFile("mujoco_666_test_result.csv");
     if (!outFile.is_open()) {

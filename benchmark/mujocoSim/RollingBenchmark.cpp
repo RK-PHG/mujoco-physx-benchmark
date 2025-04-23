@@ -136,9 +136,6 @@ int main(int argc, const char* argv[]) {
     benchmark::rolling::getOptionsFromArg(argc, argv, desc);
     benchmark::mujoco::getOptionsFromArg(argc, argv, desc);
 
-//    benchmark::rolling::getParamsFromYAML(benchmark::rolling::getYamlpath().c_str(),
-//                                          benchmark::MUJOCO);
-
     RAIINFO(
             std::endl << "=======================" << std::endl
                       << "Simulator: MUJOCO" << std::endl
@@ -156,30 +153,6 @@ int main(int argc, const char* argv[]) {
     setupWorld();
     simulationLoop(false, true);
     double error = benchmark::rolling::data.computeError();
-
-
-//    // reset
-//    resetWorld();
-//
-//    // trial2: get CPU time
-//    setupWorld();
-//    double time = simulationLoop(true, false);
-//
-//    if(benchmark::rolling::options.csv)
-//        benchmark::rolling::printCSV(benchmark::rolling::getCSVpath(),
-//                                     benchmark::mujoco::options.simName,
-//                                     benchmark::mujoco::options.solverName,
-//                                     benchmark::mujoco::options.detectorName,
-//                                     benchmark::mujoco::options.integratorName,
-//                                     time,
-//                                     error);
-//
-//    RAIINFO(
-//            std::endl << "CPU time   : " << time << std::endl
-//                      << "mean error : " << error << std::endl
-//                      << "speed (Hz) : " << benchmark::rolling::params.T / benchmark::rolling::options.dt / time << std::endl
-//                      << "=======================" << std::endl
-//    )
 
     delete sim;
     return 0;

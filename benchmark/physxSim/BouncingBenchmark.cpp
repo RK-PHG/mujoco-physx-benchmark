@@ -96,49 +96,9 @@ double simulationLoop(bool timer = true, bool error = true) {
 
 int main(int argc, const char* argv[]) {
 
-//    benchmark::bouncing::addDescToOption(desc);
-//    benchmark::dart::addDescToOption(desc);
-//
-//    benchmark::bouncing::getOptionsFromArg(argc, argv, desc);
-//    benchmark::dart::getOptionsFromArg(argc, argv, desc);
-
-//    benchmark::bouncing::getParamsFromYAML(benchmark::bouncing::getYamlPath().c_str(),
-//                                           benchmark::DART);
-
-//    RAIINFO(
-//            std::endl << "=======================" << std::endl
-//                      << "Simulator: DART" << std::endl
-//                      << "GUI      : " << benchmark::bouncing::options.gui << std::endl
-//                      << "ERP      : " << benchmark::bouncing::options.erpYN << std::endl
-//                      << "Res Coef : " << benchmark::bouncing::options.e << std::endl
-//                      << "Timestep : " << benchmark::bouncing::options.dt << std::endl
-//                      << "Solver   : " << benchmark::dart::options.solverName << std::endl
-//                      << "-----------------------"
-//    )
-
-    // trial1: get Error
     setupSimulation();
     setupWorld();
     simulationLoop(false, true);
-//    double error = benchmark::bouncing::data.computeError();
-
-//    // reset
-//    objList.clear();
-//    delete sim;
-//
-//    // trial2: get CPU time
-//    setupSimulation();
-//    setupWorld();
-//    double time = simulationLoop(true, false);
-
-//    if(benchmark::bouncing::options.csv)
-//        benchmark::bouncing::printCSV(benchmark::bouncing::getCSVpath(),
-//                                      benchmark::dart::options.simName,
-//                                      benchmark::dart::options.solverName,
-//                                      benchmark::dart::options.detectorName,
-//                                      benchmark::dart::options.integratorName,
-//                                      time,
-//                                      error);
 
     std::ofstream outFile("physx_free_drop_test_result.csv");
     if (!outFile.is_open()) {

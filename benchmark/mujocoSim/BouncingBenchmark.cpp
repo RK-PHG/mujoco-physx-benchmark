@@ -129,9 +129,6 @@ int main(int argc, const char* argv[]) {
     benchmark::bouncing::getOptionsFromArg(argc, argv, desc);
     benchmark::mujoco::getOptionsFromArg(argc, argv, desc);
 
-//    benchmark::bouncing::getParamsFromYAML(benchmark::bouncing::getYamlPath().c_str(),
-//                                           benchmark::DART);
-
     RAIINFO(
             std::endl << "=======================" << std::endl
                       << "Simulator: MUJOCO" << std::endl
